@@ -1,20 +1,17 @@
 import { NextResponse } from 'next/server';
+import { runDashboardAnalysis } from '@/services/dashboard.service';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-    // Chamamos a mesma lógica do dashboard, mas forçando o disparo do alerta
-    const baseUrl = new URL(request.url).origin;
-
     try {
-        const res = await fetch(`${baseUrl}/api/dashboard?triggerAlert=true`, {
-            headers: {
-                'x-vercel-cron': 'true' // Identificador opcional para logs
-            }
-        });
+        // Executamos a análise e o disparo de alertas diretamente via Service
+        // O parâmetro 'true' força o processamento dos alertas
+        await runDashboardAnalysis(true);
 
-        const data = await res.json();
         return NextResponse.json({
             success: true,
-            message: 'Cron executado com sucesso',
+            message: 'Análise agendada executada com sucesso',
             timestamp: new Date().toISOString()
         });
     } catch (error) {
