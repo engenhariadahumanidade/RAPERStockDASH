@@ -1,14 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Define as rotas públicas (que não precisam de login)
+// Public routes
 const isPublicRoute = createRouteMatcher([
     '/api/(.*)',
-    '/unauthorized',
-    '/.well-known/(.*)'
+    '/unauthorized'
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // Se não for uma rota pública, exige login
     if (!isPublicRoute(req)) {
         await auth.protect();
     }
@@ -16,7 +14,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
     matcher: [
-        // Padrão recomendado pelo Clerk para Next.js 15+
+        // Capture EVERYTHING except static files and _next
         '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
         '/(api|trpc)(.*)',
     ],
