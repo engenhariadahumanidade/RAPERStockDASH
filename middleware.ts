@@ -30,10 +30,6 @@ export default clerkMiddleware(async (auth, req) => {
         // 2. Access Control Check (Allowed Users)
         const email = (sessionClaims?.email as string) || "";
 
-        // Check if user is in allowed list or is the site owner
-        // We'll treat the FIRST user to ever sign in as an Admin if no one else is,
-        // or we'll check against our AllowedUser table.
-
         const allowed = await prisma.allowedUser.findUnique({
             where: { email }
         });
@@ -42,12 +38,9 @@ export default clerkMiddleware(async (auth, req) => {
             where: { email }
         });
 
-        // If the user is not allowed and not in the DB, and it's not the owner email
-        // IMPORTANT: Edit the admin email below or use the AllowedUser table
-        const isAdmin = dbUser?.isAdmin || email === process.env.ADMIN_EMAIL;
+        const isAdmin = dbUser?.isAdmin || email === "engenhariadahumanidade@gmail.com";
 
         if (!allowed && !isAdmin) {
-            // Redireciona para uma página de "Sem acesso" ou home se não permitido
             return NextResponse.redirect(new URL('/unauthorized', req.url));
         }
 
