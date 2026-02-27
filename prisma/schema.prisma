@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Stock {
+  id           Int      @id @default(autoincrement())
+  symbol       String   @unique
+  quantity     Float    @default(0)
+  averagePrice Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Settings {
+  id            Int      @id @default(autoincrement())
+  webhookUrl    String   @default("")
+  phoneNumber   String   @default("")
+  autoAlerts    Boolean  @default(true)
+  customMessage String   @default("🚨 *ALERTA DA CARTEIRA* 🚨\n\nIdentificamos os seguintes movimentos:\n\n{{alerts}}\n\n💡 *DICAS DE NOVAS AÇÕES* 💡\n{{suggestions}}")
+  scanInterval  Int      @default(15)
+  lastAlertHash String?
+  lastAlertTime DateTime?
+  workStart     String   @default("10:00")
+  workEnd       String   @default("19:00")
+  updatedAt     DateTime @updatedAt
+}
+
+model SystemLog {
+  id        Int      @id @default(autoincrement())
+  message   String
+  level     String   @default("info") // info, warning, success
+  createdAt DateTime @default(now())
+}
+
