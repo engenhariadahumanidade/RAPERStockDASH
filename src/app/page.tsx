@@ -72,6 +72,7 @@ function SuggestionCard({ sug }: { sug: any }) {
 }
 
 export default function Dashboard() {
+  console.log("RAPERStockDASH - Versão Diagnóstico 1.0.0");
   const [data, setData] = useState<{ portfolio: any[]; suggestions: any[]; trending?: any[]; scanInterval?: number; logs?: any[] } | null>(null);
   const [loading, setLoading] = useState(true);
 
