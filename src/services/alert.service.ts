@@ -80,9 +80,11 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     let templateToUse = settings.customMessage || "Sinais:\n{{alerts}}\n\nDicas:\n{{suggestions}}";
 
+    const spHour = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
+
     // Use full report for new hours or first alert
     if ((isNewHour || isFirstTime) && !templateToUse.includes('{{panorama}}')) {
-        templateToUse = `🕘 *BOLETIM DAS ${now.getHours()}h - PANORAMA DO MERCADO* 🕘\n\n` +
+        templateToUse = `🕘 *BOLETIM DAS ${spHour}h - PANORAMA DO MERCADO* 🕘\n\n` +
             `📊 *PANORAMA GERAL:*\n{{panorama}}\n\n` +
             `📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n` +
             `💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n` +
@@ -98,7 +100,7 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     finalMsg = replaceAll(finalMsg, 'panorama', panorama);
     finalMsg = replaceAll(finalMsg, 'trends', topTrends);
     finalMsg = replaceAll(finalMsg, 'highlights', highlights);
-    finalMsg += `\n\n⏰ Horário da Análise: ${now.toLocaleTimeString('pt-BR')}`;
+    finalMsg += `\n\n⏰ Horário da Análise: ${now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`;
 
     const currentStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
     const inWorkingHours = currentStr >= (settings.workStart || "10:00") && currentStr <= (settings.workEnd || "19:00");
@@ -111,7 +113,8 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
                 data: { lastAlertHash: activeHash, lastAlertTime: now, lastAlertFullContent: finalMsg }
             });
 
-            let msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${now.getHours()}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
+            const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
+            let msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
             await (prisma as any).systemLog.create({ data: { message: msgLog, level: "success" } });
         } catch (e) {
             console.error("Falha ao enviar webhook", e);
