@@ -95,7 +95,7 @@ export default function Dashboard() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/dashboard?triggerAlert=true");
+        const res = await fetch("/api/dashboard");
         const json = await res.json();
 
         if (isMounted) {
