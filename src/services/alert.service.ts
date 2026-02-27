@@ -9,7 +9,7 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     }
 
     const alertsText = alerts.length > 0 ? alerts.join('\n') : 'Sem sinais de compra/venda relevantes no momento.';
-    let suggestionsText = suggestions.length > 0
+    const suggestionsText = suggestions.length > 0
         ? suggestions.map((s: any) => `• [${s.symbol}] - Motivo: ${s.reason} \n  (Preço: R$ ${s.price.toFixed(2).replace('.', ',')})`).join('\n')
         : 'Nenhuma grande oportunidade no momento.';
 
@@ -114,7 +114,7 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
             });
 
             const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
-            let msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
+            const msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
             await (prisma as any).systemLog.create({ data: { message: msgLog, level: "success" } });
         } catch (e) {
             console.error("Falha ao enviar webhook", e);

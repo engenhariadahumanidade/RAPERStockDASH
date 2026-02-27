@@ -10,16 +10,17 @@ export default function AdminPage() {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
     const fetchUsers = async () => {
         const res = await fetch("/api/admin/allowed-users");
         const data = await res.json();
         setAllowedUsers(data);
         setLoading(false);
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchUsers();
+    }, []);
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();

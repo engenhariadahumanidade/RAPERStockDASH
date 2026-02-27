@@ -12,7 +12,7 @@ export async function runDashboardAnalysis(triggerAlert: boolean = false) {
     ]);
 
     // 2. Map and analyze Portfolio concurrently
-    let alerts: string[] = [];
+    const alerts: string[] = [];
     const analyzedPortfolio = await Promise.all(
         portfolio.map(async (stock: any) => {
             const analysis = await analyzeStock(stock.symbol);
