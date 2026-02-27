@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Activity, Settings as SettingsIcon, LayoutDashboard, WalletCards } from 'lucide-react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -42,6 +43,23 @@ export default function Navbar() {
                         </Link>
                     );
                 })}
+            </div>
+
+            <div className="flex items-center gap-4">
+                <SignedIn>
+                    <UserButton afterSignOutUrl="/" appearance={{
+                        elements: {
+                            avatarBox: "w-10 h-10 rounded-xl border border-slate-600 shadow-lg"
+                        }
+                    }} />
+                </SignedIn>
+                <SignedOut>
+                    <SignInButton mode="modal">
+                        <button className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/20 text-sm">
+                            Entrar
+                        </button>
+                    </SignInButton>
+                </SignedOut>
             </div>
         </nav>
     );
