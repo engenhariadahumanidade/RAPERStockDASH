@@ -39,3 +39,17 @@ model SystemLog {
   createdAt DateTime @default(now())
 }
 
+model User {
+  id        String   @id // Clerk User ID
+  email     String   @unique
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AllowedUser {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+

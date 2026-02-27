@@ -1,17 +1,23 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, Settings as SettingsIcon, LayoutDashboard, WalletCards } from 'lucide-react';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import { Shield, Users, Activity, LayoutDashboard, Settings as SettingsIcon, WalletCards } from 'lucide-react';
 
 export default function Navbar() {
     const pathname = usePathname();
+    const { user: clerkUser } = useUser();
+    const isAdmin = clerkUser?.primaryEmailAddress?.emailAddress === "engenhariadahumanidade@gmail.com";
 
     const navs = [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
         { name: 'Minha Carteira', href: '/manage', icon: WalletCards },
         { name: 'Configurações', href: '/settings', icon: SettingsIcon },
     ];
+
+    if (isAdmin) {
+        navs.push({ name: 'Admin', href: '/admin', icon: Shield });
+    }
 
     return (
         <nav className="flex items-center justify-between p-4 mb-8 glass rounded-2xl shadow-xl shadow-black/50 border border-slate-700">
