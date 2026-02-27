@@ -13,85 +13,59 @@ const formatBRL = (value: number) => {
 };
 
 function SuggestionCard({ sug }: { sug: any }) {
-  const [investValue, setInvestValue] = useState<string>("1000");
-
-  const shares = Math.floor(Number(investValue) / sug.price);
-  const totalCost = shares * sug.price;
-  const targetProfit = shares * (sug.sma50 - sug.price);
-  const dyValue = sug.dy ? ((totalCost * (sug.dy / 100)) / 12).toFixed(2) : "0.00";
+  const isDividend = sug.reason.includes('DIVIDEND');
+  const isTechnical = sug.reason.includes('TÉCNICA');
+  const isRecovery = sug.reason.includes('RECOMPOSIÇÃO');
 
   return (
-    <div className="bg-slate-800/50 p-4 border border-slate-700 rounded-2xl hover:border-emerald-500/40 transition-colors group relative overflow-hidden">
-      <div className="absolute -right-16 -top-16 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Coins className="w-32 h-32 text-brand-500" />
-      </div>
+    <div className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl hover:bg-slate-800/60 transition-all group relative overflow-hidden">
+      <div className={`absolute top-0 left-0 w-1.5 h-full ${isDividend ? 'bg-amber-500' : isTechnical ? 'bg-emerald-500' : 'bg-blue-500'}`} />
 
-      <div className="flex justify-between items-center mb-2 relative z-10">
+      <div className="flex justify-between items-start mb-4 relative z-10">
         <div className="flex items-center gap-3">
-          {sug.logo && <img src={sug.logo} alt={sug.symbol} className="w-8 h-8 rounded-full bg-white p-1" />}
-          <span className="font-bold text-xl">{sug.symbol}</span>
+          {sug.logo && <img src={sug.logo} alt={sug.symbol} className="w-10 h-10 rounded-full bg-white p-1.5 shadow-lg" />}
+          <a
+            href={`https://statusinvest.com.br/acoes/${sug.symbol.replace('.SA', '').toLowerCase()}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-2xl tracking-tight hover:text-emerald-400 transition-colors cursor-pointer underline decoration-dotted decoration-emerald-500/30 underline-offset-4"
+          >
+            {sug.symbol}
+          </a>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <span className="text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">
-            Comprar
+        <div className="flex flex-col items-end gap-1.5">
+          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ${isDividend ? 'text-amber-400 bg-amber-400/10 border border-amber-400/20' : isTechnical ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' : 'text-blue-400 bg-blue-400/10 border border-blue-400/20'}`}>
+            {isDividend ? 'Dividendo Alto' : isTechnical ? 'Técnico Forte' : 'Recuperação'}
           </span>
           {sug.dy >= 6 && (
-            <span className="text-amber-400 bg-amber-400/10 px-2 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest border border-amber-400/20">
-              🔥 Alto DY ({sug.dy.toFixed(1)}%)
+            <span className="text-amber-400 bg-amber-900/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border border-amber-500/20">
+              🔥 TOP DY
             </span>
           )}
         </div>
       </div>
 
-      <div className="text-2xl font-black mb-2 relative z-10">{formatBRL(sug.price)}</div>
-      <p className="text-xs text-slate-400 relative z-10">{sug.reason}</p>
-
-      <div className="mt-3 flex gap-4 text-xs border-b border-slate-700/50 pb-4 mb-4 relative z-10">
-        <div className="flex flex-col"><span className="text-slate-500 uppercase">RSI</span><span className="text-emerald-400 font-semibold">{sug.rsi.toFixed(1)}</span></div>
-        <div className="flex flex-col"><span className="text-slate-500 uppercase">24h</span><span className={sug.changePercent > 0 ? "text-emerald-400" : "text-rose-400"}>{sug.changePercent.toFixed(2)}%</span></div>
-        {sug.dy > 0 && <div className="flex flex-col"><span className="text-slate-500 uppercase">DY Anual</span><span className="text-amber-400 font-semibold">{sug.dy.toFixed(2)}%</span></div>}
-      </div>
-
-      {/* Simulador */}
-      <div className="relative z-10 bg-black/40 p-4 rounded-xl border border-slate-700/40">
-        <div className="flex items-center gap-2 mb-3">
-          <Calculator className="w-4 h-4 text-brand-400" />
-          <h4 className="text-sm font-bold text-slate-300">Simular Investimento</h4>
+      <div className="space-y-4 relative z-10">
+        <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-700/30">
+          <p className="text-sm text-slate-200 leading-relaxed font-semibold">
+            {sug.reason}
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-slate-400 font-bold">R$</span>
-          <input
-            type="number"
-            value={investValue}
-            onChange={(e) => setInvestValue(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-white focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono"
-            placeholder="Ex: 1000"
-          />
-        </div>
-
-        {shares > 0 ? (
-          <div className="space-y-1.5 text-xs">
-            <div className="flex justify-between">
-              <span className="text-slate-500">Poder de compra:</span>
-              <span className="text-slate-300 font-mono">{shares} ações</span>
-            </div>
-            {sug.sma50 > sug.price && (
-              <div className="flex justify-between">
-                <span className="text-slate-500">Retorno até Média (SMA50):</span>
-                <span className="text-emerald-400 font-mono font-bold">+{formatBRL(targetProfit)}</span>
-              </div>
-            )}
-            {sug.dy > 0 && (
-              <div className="flex justify-between">
-                <span className="text-slate-500">Projeção Dividendos/mês:</span>
-                <span className="text-amber-400 font-mono">~R$ {dyValue.replace('.', ',')}</span>
-              </div>
-            )}
+        <div className="grid grid-cols-3 gap-3 pt-2">
+          <div className="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80">
+            <span className="text-slate-500 text-[9px] uppercase font-black block mb-1">Preço Atual</span>
+            <span className="text-white font-mono text-base font-black">{formatBRL(sug.price)}</span>
           </div>
-        ) : (
-          <p className="text-xs text-rose-400 italic">Valor insuficiente para 1 cota.</p>
-        )}
+          <div className="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80">
+            <span className="text-slate-500 text-[9px] uppercase font-black block mb-1">Indicador RSI</span>
+            <span className={`font-mono text-base font-black ${sug.rsi < 35 ? 'text-emerald-400' : 'text-slate-300'}`}>{sug.rsi.toFixed(1)}</span>
+          </div>
+          <div className="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80">
+            <span className="text-slate-500 text-[9px] uppercase font-black block mb-1">Div. Yield</span>
+            <span className="text-amber-400 font-mono text-base font-black">{sug.dy.toFixed(2)}%</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -212,7 +186,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Zap className="w-6 h-6 text-yellow-400" />
+              <Activity className="w-6 h-6 text-brand-400" />
               Sinais e Alertas
             </h2>
           </div>
@@ -238,7 +212,7 @@ export default function Dashboard() {
               );
 
               const isBuy = info.action === "Buy";
-              const isSell = info.action === "Sell";
+              const isSell = info.action === "Venda";
 
               const colorClass = isBuy
                 ? "border-emerald-500/50 bg-emerald-500/10"
@@ -248,6 +222,13 @@ export default function Dashboard() {
               const textClass = isBuy ? "text-emerald-400" : isSell ? "text-rose-400" : "text-amber-400";
               const Icon = isBuy ? TrendingUp : isSell ? TrendingDown : Info;
 
+              // Lucro/Prejuízo Calculation
+              const totalCost = item.quantity * item.averagePrice;
+              const currentValue = item.quantity * info.price;
+              const profitLoss = currentValue - totalCost;
+              const profitLossPct = totalCost > 0 ? (profitLoss / totalCost) * 100 : 0;
+              const isProfit = profitLoss >= 0;
+
               return (
                 <div
                   key={idx}
@@ -256,7 +237,14 @@ export default function Dashboard() {
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <h3 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                        {item.symbol}
+                        <a
+                          href={`https://statusinvest.com.br/acoes/${item.symbol.replace('.SA', '').toLowerCase()}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-emerald-400 transition-colors cursor-pointer underline decoration-dotted decoration-emerald-500/30 underline-offset-4"
+                        >
+                          {item.symbol}
+                        </a>
                         <span
                           className={`text-xs px-3 py-1 rounded-full uppercase font-bold tracking-widest border border-current ${textClass} bg-black/20`}
                         >
@@ -280,6 +268,13 @@ export default function Dashboard() {
                           {info.rsi.toFixed(1)}
                         </p>
                       </div>
+                      <div className="pl-4 border-l border-slate-700/50">
+                        <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-1">Performance</p>
+                        <p className={`text-xl font-bold ${isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {isProfit ? '+' : ''}{formatBRL(profitLoss)}
+                          <span className="text-xs ml-1 opacity-70">({profitLossPct.toFixed(2)}%)</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -294,30 +289,34 @@ export default function Dashboard() {
               );
             })}
           </div>
-        </div>
 
-        {/* Suggestion Section */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <ArrowUpRight className="w-6 h-6 text-brand-400" />
-            Oportunidades
-          </h2>
+          {/* Suggestion Section - Moved to main column */}
+          <div className="mt-12 space-y-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <ArrowUpRight className="w-6 h-6 text-brand-400" />
+              Oportunidades
+            </h2>
 
-          <div className="glass rounded-3xl p-6 border border-slate-700/60 shadow-2xl">
-            <p className="text-slate-400 text-sm mb-6">Nosso scanner detectou as seguintes oportunidades de <span className="text-emerald-400 font-bold uppercase">Compra</span> no mercado hoje:</p>
+            <div className="glass rounded-3xl p-6 border border-slate-700/60 shadow-2xl">
+              <p className="text-slate-400 text-sm mb-6">Nosso scanner detectou as seguintes oportunidades de <span className="text-emerald-400 font-bold uppercase">Compra</span> no mercado hoje:</p>
 
-            <div className="space-y-4">
-              {data?.suggestions.length === 0 && (
-                <p className="text-sm text-slate-500 italic">Nenhuma oportunidade forte de compra encontrada neste momento pelas métricas de RSI e Tendência.</p>
-              )}
-              {data?.suggestions.map((sug, idx) => (
-                <SuggestionCard key={idx} sug={sug} />
-              ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {data?.suggestions.length === 0 && (
+                  <p className="text-sm text-slate-500 italic col-span-2">Nenhuma oportunidade forte de compra encontrada neste momento pelas métricas de RSI e Tendência.</p>
+                )}
+                {data?.suggestions.map((sug, idx) => (
+                  <SuggestionCard key={idx} sug={sug} />
+                ))}
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Trending & Logs Side Grid */}
+        <div className="space-y-8">
 
           {/* Trending Section */}
-          <div className="mt-8 space-y-6">
+          <div className="space-y-6">
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
               <Flame className="w-6 h-6 text-orange-500" />
               Melhores Tendências
@@ -335,7 +334,14 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center mb-2">
                       <div className="flex items-center gap-2">
                         {trend.logo && <img src={trend.logo} alt={trend.symbol} className="w-6 h-6 rounded-full bg-white p-0.5" />}
-                        <span className="font-bold">{trend.symbol}</span>
+                        <a
+                          href={`https://statusinvest.com.br/acoes/${trend.symbol.replace('.SA', '').toLowerCase()}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-bold hover:text-orange-400 transition-colors cursor-pointer"
+                        >
+                          {trend.symbol}
+                        </a>
                       </div>
                       <span className="text-[10px] font-black uppercase bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/30">🔥 Quente</span>
                     </div>

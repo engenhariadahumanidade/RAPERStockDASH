@@ -8,7 +8,7 @@ export interface StockAnalysis {
     rsi: number;
     sma50: number;
     sma200: number;
-    action: 'Buy' | 'Sell' | 'Hold';
+    action: 'Buy' | 'Venda' | 'Hold';
     reason: string;
     dy: number;
     logo: string;
@@ -98,26 +98,26 @@ export async function analyzeStock(symbol: string): Promise<StockAnalysis | null
             dy = (totalDividends / price) * 100;
         }
 
-        let action: 'Buy' | 'Sell' | 'Hold' = 'Hold';
+        let action: 'Buy' | 'Venda' | 'Hold' = 'Hold';
         let reason = 'Mercado lateralizado, sem sinais claros.';
 
         if (rsi < 30 && price > sma200) {
             action = 'Buy';
             reason = 'Ativo sobrevendido (RSI < 30) em tendência de alta.';
         } else if (rsi > 70 && price < sma200) {
-            action = 'Sell';
+            action = 'Venda';
             reason = 'Ativo sobrecomprado (RSI > 70) em tendência de baixa.';
         } else if (sma50 > sma200 && rsi < 50) {
             action = 'Buy';
             reason = 'Golden Cross (SMA50 > SMA200) em correção (RSI < 50).';
         } else if (sma50 < sma200 && rsi > 50) {
-            action = 'Sell';
+            action = 'Venda';
             reason = 'Death Cross (SMA50 < SMA200) e possível topo local (RSI > 50).';
         } else if (rsi < 35) {
             action = 'Buy';
             reason = 'Ativo perto de sobrevenda extrema (RSI < 35).';
         } else if (rsi > 65) {
-            action = 'Sell';
+            action = 'Venda';
             reason = 'Ativo perto de sobrecompra extrema (RSI > 65).';
         }
 
@@ -140,25 +140,45 @@ export async function analyzeStock(symbol: string): Promise<StockAnalysis | null
 }
 
 export async function getTopSuggestions(): Promise<StockAnalysis[]> {
-    // Only B3 stocks since we moved to BRAPI
-    const candidates = ['PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'WEGE3', 'BBAS3', 'B3SA3'];
-    const results: StockAnalysis[] = [];
+    // Extended list of top B3 stocks for more dynamic scanning
+    const allCandidates = [
+        'PETR4', 'VALE3', 'ITUB4', 'BBDC4', 'ABEV3', 'WEGE3', 'BBAS3', 'B3SA3',
+        'PETR3', 'ITSA4', 'EGIE3', 'TRPL4', 'VBBR3', 'RENT3', 'PRIO3', 'CSNA3',
+        'ELET3', 'GGBR4', 'SANB11', 'LREN3', 'SUZB3', 'KLBN11', 'RADL3', 'EQTL3'
+    ];
 
-    // Fetch all candidates concurrently (Performance improvement)
+    // Shuffle and pick 12 at random for each scan (prevents static list)
+    const candidates = [...allCandidates].sort(() => 0.5 - Math.random()).slice(0, 12);
+
+    const results: StockAnalysis[] = [];
     const analyses = await Promise.all(candidates.map(sym => analyzeStock(sym)));
 
+    // Categorize and filter results
     analyses.forEach(analysis => {
-        // Option 1 Logic: Desconto (RSI Baixo) + Dividendos Bons (>6%)
-        if (analysis && analysis.action === 'Buy' && analysis.dy >= 6.0) {
-            analysis.reason += ' + Alto Retorno de Dividendos!';
+        if (!analysis) return;
+
+        // Rule 1: High Conviction (RSI < 30)
+        if (analysis.rsi < 32 && analysis.action === 'Buy') {
+            analysis.reason = '💎 OPORTUNIDADE TÉCNICA: Ativo em sobrevenda extrema + RSI abaixo de 32.';
             results.push(analysis);
-        } else if (analysis && analysis.action === 'Buy' && results.length < 2) {
-            // Also push top undervalued assets if we have space, even without huge DY
+        }
+        // Rule 2: Dividend King (DY > 8%)
+        else if (analysis.dy >= 8.0) {
+            analysis.reason = '💰 DIVIDEND KING: Excelente retorno de dividendos (>8%) com preço estável.';
+            results.push(analysis);
+        }
+        // Rule 3: Recovery Signal (RSI < 45 and SMA Cross or Bullish Bias)
+        else if (analysis.rsi < 45 && analysis.price > analysis.sma50) {
+            analysis.reason = '🚀 RECOMPOSIÇÃO: Em recuperação técnica, preço acima da média de 50 dias.';
             results.push(analysis);
         }
     });
 
-    return results.slice(0, 4);
+    // Return unique results, sorted by RSI (lowest first = better buy)
+    return results
+        .filter((v, i, a) => a.findIndex(t => t.symbol === v.symbol) === i)
+        .sort((a, b) => a.rsi - b.rsi)
+        .slice(0, 4);
 }
 
 export async function getTrendingStocks(): Promise<StockAnalysis[]> {

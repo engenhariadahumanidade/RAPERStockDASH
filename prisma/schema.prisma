@@ -25,6 +25,7 @@ model Settings {
   scanInterval  Int      @default(15)
   lastAlertHash String?
   lastAlertTime DateTime?
+  lastAlertFullContent String?
   workStart     String   @default("10:00")
   workEnd       String   @default("19:00")
   updatedAt     DateTime @updatedAt

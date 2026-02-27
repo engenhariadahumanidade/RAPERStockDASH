@@ -1,4 +1,7 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RAPERStockDASH - Terminal Inteligente de Ações B3
+
+Este é um projeto [Next.js](https://nextjs.org) desenvolvido para monitoramento e análise de ações da B3.
+
 
 ## Getting Started
 

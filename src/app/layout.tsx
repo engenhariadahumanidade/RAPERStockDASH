@@ -5,8 +5,11 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Stock Analytics Pro Dashboard',
-  description: 'A premium automated stock analysis dashboard',
+  title: 'RAPERStock Dashboard',
+  description: 'O seu terminal inteligente para análise e alertas de ações da B3.',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({

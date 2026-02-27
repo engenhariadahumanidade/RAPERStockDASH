@@ -19,7 +19,7 @@ export async function GET(request: Request) {
         // 2. Map and analyze Portfolio concurrently
         let alerts: string[] = [];
         const analyzedPortfolio = await Promise.all(
-            portfolio.map(async (stock) => {
+            portfolio.map(async (stock: any) => {
                 const analysis = await analyzeStock(stock.symbol);
                 if (analysis) {
                     if (analysis.action !== 'Hold') {
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
 
         // 3. Send Alerts if requested
         if (triggerAlert) {
-            await processAlerts(alerts, suggestions, settings);
+            await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio);
         }
 
         // Fetch last 5 logs for updating the dashboard

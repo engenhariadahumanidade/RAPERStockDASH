@@ -10,7 +10,7 @@ export async function GET() {
                     webhookUrl: '',
                     phoneNumber: '',
                     autoAlerts: true,
-                    customMessage: "🚨 *ALERTA DA CARTEIRA* 🚨\n\nIdentificamos os seguintes movimentos:\n\n{{alerts}}\n\n💡 *DICAS DE NOVAS AÇÕES* 💡\n{{suggestions}}",
+                    customMessage: "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação.",
                     scanInterval: 15,
                 },
             });
