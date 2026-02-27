@@ -1,7 +1,7 @@
 {
     "crons": [
         {
-            "path": "/api/dashboard?triggerAlert=true",
+            "path": "/api/cron",
             "schedule": "*/30 * * * *"
         }
     ]
