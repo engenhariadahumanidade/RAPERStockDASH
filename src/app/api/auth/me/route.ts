@@ -16,24 +16,30 @@ export async function GET() {
             return NextResponse.json({ isAllowed: false, isAdmin: false }, { status: 403 });
         }
 
-        // Ensure user exists in Prisma
-        const dbUser = await prisma.user.upsert({
-            where: { id: userId },
-            update: { email },
-            create: { id: userId, email }
-        });
-
         // Hardcode master admin email or check DB
         const isMasterAdmin = email.toLowerCase() === "engenhariadahumanidade@gmail.com" || email === process.env.ADMIN_EMAIL;
-        const isAdmin = dbUser.isAdmin || isMasterAdmin;
+        let isAdmin = isMasterAdmin;
+        let isAllowed = isMasterAdmin;
 
-        // Check if user is allowed
-        let isAllowed = isAdmin;
-        if (!isAllowed) {
-            const allowedRecord = await prisma.allowedUser.findUnique({
-                where: { email: email.toLowerCase() }
+        try {
+            const dbUser = await prisma.user.upsert({
+                where: { id: userId },
+                update: { email },
+                create: { id: userId, email }
             });
-            isAllowed = !!allowedRecord;
+            if (dbUser.isAdmin) isAdmin = true;
+            isAllowed = isAdmin;
+
+            if (!isAllowed) {
+                const allowedRecord = await prisma.allowedUser.findUnique({
+                    where: { email: email.toLowerCase() }
+                });
+                isAllowed = !!allowedRecord;
+            }
+        } catch (dbError) {
+            console.error("Database error in /api/auth/me:", dbError);
+            // Fallback: master admin is always allowed even if DB is down.
+            // Other users will be blocked.
         }
 
         return NextResponse.json({

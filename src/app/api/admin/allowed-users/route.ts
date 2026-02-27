@@ -7,8 +7,9 @@ export async function GET() {
     const email = (sessionClaims?.email as string) || "";
 
     // Check if the current user is admin to allow listing
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user?.isAdmin && email !== process.env.ADMIN_EMAIL) {
+    const isMasterAdmin = email.toLowerCase() === "engenhariadahumanidade@gmail.com" || email === process.env.ADMIN_EMAIL;
+    const user = await prisma.user.findUnique({ where: { email } }).catch(() => null);
+    if (!user?.isAdmin && !isMasterAdmin) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -22,8 +23,9 @@ export async function POST(req: Request) {
     const { sessionClaims } = await auth();
     const emailAdmin = (sessionClaims?.email as string) || "";
 
-    const user = await prisma.user.findUnique({ where: { email: emailAdmin } });
-    if (!user?.isAdmin && emailAdmin !== process.env.ADMIN_EMAIL) {
+    const isMasterAdmin = emailAdmin.toLowerCase() === "engenhariadahumanidade@gmail.com" || emailAdmin === process.env.ADMIN_EMAIL;
+    const user = await prisma.user.findUnique({ where: { email: emailAdmin } }).catch(() => null);
+    if (!user?.isAdmin && !isMasterAdmin) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -44,8 +46,9 @@ export async function DELETE(req: Request) {
     const { sessionClaims } = await auth();
     const emailAdmin = (sessionClaims?.email as string) || "";
 
-    const user = await prisma.user.findUnique({ where: { email: emailAdmin } });
-    if (!user?.isAdmin && emailAdmin !== process.env.ADMIN_EMAIL) {
+    const isMasterAdmin = emailAdmin.toLowerCase() === "engenhariadahumanidade@gmail.com" || emailAdmin === process.env.ADMIN_EMAIL;
+    const user = await prisma.user.findUnique({ where: { email: emailAdmin } }).catch(() => null);
+    if (!user?.isAdmin && !isMasterAdmin) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
