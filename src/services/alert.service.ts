@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { sendWebhookMessage } from '@/lib/webhook';
+import { sendPushNotification } from '@/lib/onesignal';
 import crypto from 'crypto';
 import { StockAnalysis } from '@/lib/yahoo-finance';
 
@@ -126,7 +127,28 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     if (inWorkingHours || isTest) {
         try {
+            // Envios
             await sendWebhookMessage(settings.webhookUrl, settings.phoneNumber, finalMsg);
+
+            // Dispatch Push Notification
+            let pushTitle = "Alerta RAPERStock";
+            let pushMsg = "Tem movimentação na sua carteira!";
+
+            if (isTest) {
+                pushTitle = "Teste de Integração";
+                pushMsg = "Push Notification recebida com sucesso!";
+            } else if (alerts.length > 0) {
+                pushTitle = "🚀 Sinais Detectados";
+                pushMsg = `Identificamos ${alerts.length} ações com sinal de compra/venda. Acesse para ver!`;
+            } else if (isNewHour) {
+                pushTitle = "Boletim da Hora";
+                pushMsg = "Resumo atualizado do mercado para acompanhamento.";
+            }
+
+            // Manda especificamente para o UserID deste settings (External ID via Clerk)
+            if (userId) {
+                await sendPushNotification(pushTitle, pushMsg, [userId]);
+            }
 
             // Don't update hash/time for tests to keep them independent
             if (!isTest) {

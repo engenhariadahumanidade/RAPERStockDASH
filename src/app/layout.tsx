@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
 import RoleGuardClient from '@/components/RoleGuardClient';
+import OneSignalProvider from '@/components/OneSignalProvider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -23,6 +24,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="pt-BR">
         <body className={`${inter.className} bg-[#0f172a] text-slate-50 antialiased selection:bg-brand-500/30`}>
+          <OneSignalProvider />
           <div className="min-h-screen relative flex flex-col">
             <main className="flex-1 w-full max-w-[1600px] mx-auto p-4 md:p-8 relative z-10">
               <SignedIn>

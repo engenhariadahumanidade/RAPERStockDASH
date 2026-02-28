@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import { TrendingUp, TrendingDown, Info, Loader2, ArrowUpRight, Zap, Terminal, Flame, Eye } from "lucide-react";
+import { Info, Loader2, Zap, Terminal, Flame, Eye } from "lucide-react";
 
 const formatBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -14,7 +14,6 @@ const formatBRL = (value: number) => {
 function SuggestionCard({ sug }: { sug: any }) {
   const isDividend = sug.reason.includes('DIVIDEND');
   const isTechnical = sug.reason.includes('TÉCNICA');
-  const isRecovery = sug.reason.includes('RECOMPOSIÇÃO');
 
   const themeColor = isDividend ? 'amber' : isTechnical ? 'emerald' : 'blue';
 
@@ -151,7 +150,7 @@ export default function Dashboard() {
               <div className="bg-slate-900 border border-slate-800 p-12 rounded-3xl flex flex-col items-center justify-center text-center">
                 <Info className="w-16 h-16 text-slate-600 mb-6" />
                 <p className="text-white font-bold text-xl md:text-2xl mb-2 tracking-tight">Sem ativos monitorados</p>
-                <p className="text-slate-400 md:text-lg max-w-md">Gerencie sua carteira adicionando ações na página "Minha Carteira" para obter análises em tempo real.</p>
+                <p className="text-slate-400 md:text-lg max-w-md">Gerencie sua carteira adicionando ações na página &quot;Minha Carteira&quot; para obter análises em tempo real.</p>
               </div>
             )}
 
