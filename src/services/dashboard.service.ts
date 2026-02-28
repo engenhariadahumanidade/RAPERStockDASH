@@ -34,9 +34,10 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
         })
     );
 
+    let alertStatus = null;
     // 3. Send Alerts if requested
     if (triggerAlert && settings) {
-        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName, isTest);
+        alertStatus = await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName, isTest);
     }
 
     // Fetch last 5 logs for user
@@ -76,6 +77,7 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
         trending,
         scanInterval: settings?.scanInterval || 15,
         logs,
-        userName
+        userName,
+        alertStatus
     };
 }

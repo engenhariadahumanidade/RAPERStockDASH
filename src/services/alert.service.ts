@@ -6,7 +6,7 @@ import { StockAnalysis } from '@/lib/yahoo-finance';
 
 export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor", isTest: boolean = false) {
     if (!settings?.webhookUrl || !settings?.phoneNumber || (!settings.autoAlerts && !isTest)) {
-        return;
+        return { status: "skipped", reason: "no_contact_or_auto_alerts_disabled" };
     }
 
     const alertsText = alerts.length > 0 ? alerts.join('\n') : 'Sem sinais de compra/venda relevantes no momento.';
@@ -43,7 +43,7 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     // Bypass rules for manual tests
     if (!isTest) {
         if (secondsSinceLast < 120) {
-            return; // Duplicate prevention
+            return { status: "skipped", reason: "duplicate_prevention_120s" }; // Duplicate prevention
         }
 
         // Priority Rule: If signals changed but we are close to the next hour, skip to wait for the full report.
@@ -55,7 +55,7 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
                     level: "info"
                 }
             });
-            return;
+            return { status: "skipped", reason: "postponed_to_next_hour" };
         }
 
         // Send logic:
@@ -66,7 +66,7 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
         if (!shouldSend) {
             // Log subtle info that scan was done but skipped
-            return;
+            return { status: "skipped", reason: "no_changes_and_not_report_hour" };
         }
     }
 
@@ -169,9 +169,12 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
                     }
                 });
             }
+            return { status: "sent", reason: isTest ? "test" : (isFirstTime ? "first_time" : isNewHour ? "new_hour_report" : "signals_changed") };
         } catch (e) {
             console.error("Falha ao enviar webhook", e);
             await prisma.systemLog.create({ data: { userId, message: "❌ Falha no disparador de Webhook.", level: "warning" } });
+            return { status: "failed", reason: "webhook_error", error: String(e) };
         }
     }
+    return { status: "skipped", reason: "out_of_working_hours" };
 }
