@@ -4,8 +4,15 @@ import prisma from '@/lib/prisma';
 import { sendWebhookMessage } from '@/lib/webhook';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
+    // Verify Vercel Cron Secret
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const usersToAlert = await prisma.settings.findMany({
             where: { autoAlerts: true },
