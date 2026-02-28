@@ -3,7 +3,7 @@ import { sendWebhookMessage } from '@/lib/webhook';
 import crypto from 'crypto';
 import { StockAnalysis } from '@/lib/yahoo-finance';
 
-export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string) {
+export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor") {
     if (!settings?.webhookUrl || !settings?.phoneNumber || !settings.autoAlerts) {
         return;
     }
@@ -102,6 +102,10 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     finalMsg = replaceAll(finalMsg, 'panorama', panorama);
     finalMsg = replaceAll(finalMsg, 'trends', topTrends);
     finalMsg = replaceAll(finalMsg, 'highlights', highlights);
+
+    // Prefix the greeting
+    finalMsg = `Olá, *${userName}*! 👋\n\n${finalMsg}`;
+
     finalMsg += `\n\n⏰ Horário da Análise: ${now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`;
 
     const currentStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });

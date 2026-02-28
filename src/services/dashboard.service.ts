@@ -8,12 +8,16 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
     }
 
     // 1. Fetch initial requirements concurrently
-    const [portfolio, suggestions, settings, trending] = await Promise.all([
+    const [portfolio, suggestions, settings, trending, user] = await Promise.all([
         prisma.stock.findMany({ where: { userId } }),
         getTopSuggestions(),
         prisma.settings.findUnique({ where: { userId } }),
-        getTrendingStocks()
+        getTrendingStocks(),
+        prisma.user.findUnique({ where: { id: userId } })
     ]);
+
+    // Extract raw email prefix as user name
+    const userName = user?.email?.split('@')[0] || "Investidor";
 
     // 2. Map and analyze Portfolio concurrently
     const alerts: string[] = [];
@@ -32,7 +36,7 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
 
     // 3. Send Alerts if requested
     if (triggerAlert && settings) {
-        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId);
+        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName);
     }
 
     // Fetch last 5 logs for user
@@ -71,6 +75,7 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
         suggestions,
         trending,
         scanInterval: settings?.scanInterval || 15,
-        logs
+        logs,
+        userName
     };
 }
