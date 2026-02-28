@@ -247,19 +247,28 @@ export default function AdminPage() {
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
-                                        Template do Boletim
-                                    </label>
+                                <div className="pt-4 border-t border-slate-700/50 mt-4">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest block">
+                                            Mensagem de Alerta (Template)
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setGlobalSettings({ ...globalSettings, customMessage: "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação." })}
+                                            className="text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition-all uppercase tracking-tight shadow-sm active:scale-95"
+                                        >
+                                            Restaurar Padrão
+                                        </button>
+                                    </div>
                                     <textarea
-                                        rows={8}
+                                        rows={12}
                                         required
                                         value={globalSettings.customMessage}
                                         onChange={(e) => setGlobalSettings({ ...globalSettings, customMessage: e.target.value })}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-xs font-mono"
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 px-5 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-xs font-mono shadow-inner mb-2"
                                     />
-                                    <p className="text-[10px] text-slate-500 italic mt-1">
-                                        Variáveis: {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'}, {'{{highlights}}'}
+                                    <p className="text-[11px] text-slate-500 italic leading-relaxed">
+                                        Use as variáveis {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'} e {'{{highlights}}'} onde desejar que o conteúdo flua automaticamente no webhook.
                                     </p>
                                 </div>
 
