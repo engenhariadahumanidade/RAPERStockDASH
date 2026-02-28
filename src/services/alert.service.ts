@@ -36,6 +36,9 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     }
     const isNewHour = !lastAlertHourNormalized || currentHourStart.getTime() > lastAlertHourNormalized.getTime();
 
+    const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
+    const isIdleReportHour = ["11", "16"].includes(currentHourSP);
+
     // Bypass rules for manual tests
     if (!isTest) {
         if (secondsSinceLast < 120) {
@@ -54,16 +57,14 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
             return;
         }
 
-        const shouldSend = isFirstTime || isNewHour || isChanged;
+        // Send logic:
+        // 1. Send if signals changed (ALWAYS)
+        // 2. Send if it's the very first time
+        // 3. Send if it's a new hour AND it's one of the status report windows (11h or 16h)
+        const shouldSend = isChanged || isFirstTime || (isNewHour && isIdleReportHour);
 
         if (!shouldSend) {
-            await prisma.systemLog.create({
-                data: {
-                    userId,
-                    message: "✅ Varredura concluída. Sem sinais novos. Aguardando a próxima hora cheia.",
-                    level: "info"
-                }
-            });
+            // Log subtle info that scan was done but skipped
             return;
         }
     }
@@ -107,6 +108,12 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     // Prefix the greeting
     finalMsg = `Olá, *${userName}*! 👋\n\n${finalMsg}`;
+
+    if (!isChanged && !isFirstTime && isIdleReportHour && !isTest) {
+        finalMsg = `💤 *BOLSA SEM NOVIDADES* 💤\n\n` +
+            `O mercado está lateralizado ou parado no momento, mas o seu *RAPERStock* segue monitorando 24h por dia e trabalhando para você! 🚀\n\n` +
+            finalMsg;
+    }
 
     if (isTest) {
         finalMsg = `⚠️ *[TESTE DE DISPARO]* ⚠️\n\n${finalMsg}`;
