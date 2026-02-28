@@ -396,6 +396,13 @@ export default function AdminPage() {
                         <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl mt-8">
                             <h3 className="text-lg font-bold text-white mb-2">Testar OneSignal (Push)</h3>
                             <p className="text-sm text-slate-400 mb-4">Envie uma notificação push teste para o seu próprio navegador ou celular.</p>
+
+                            {!process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID && (
+                                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
+                                    <p className="text-xs text-red-400 font-bold">⚠️ ATENÇÃO: A variável `NEXT_PUBLIC_ONESIGNAL_APP_ID` não foi encontrada na Vercel!</p>
+                                    <p className="text-[10px] text-red-400/80 mt-1">O botão não funcionará e o prompt não aparecerá para seus usuários até você configurar essa chave na aba Environment Variables da Vercel e fazer um Redeploy.</p>
+                                </div>
+                            )}
                             <button
                                 onClick={handleTestOneSignal}
                                 disabled={testOneSignalStatus === 'loading'}
