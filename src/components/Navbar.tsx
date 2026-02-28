@@ -26,7 +26,7 @@ export default function Navbar() {
                     <Activity className="w-6 h-6 text-white" />
                 </div>
                 <h1 className="text-xl font-bold tracking-tight text-white hidden lg:block">
-                    RAPERStock <span className="text-brand-400">Dashboard ({clerkUser?.emailAddresses[0]?.emailAddress?.split('@')[0] || "Investidor"})</span>
+                    RAPERStock <span className="text-brand-400">Dashboard ({clerkUser?.emailAddresses[0]?.emailAddress?.split('@')[0] || "Investidor"}) <span className="text-[10px] ml-1 px-2 py-0.5 bg-brand-500/10 rounded-md border border-brand-500/20 uppercase font-black tracking-widest">v4.2.1</span></span>
                 </h1>
             </div>
 
