@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import { TrendingUp, TrendingDown, Info, Loader2, ArrowUpRight, Zap, Clock, RefreshCw, Activity, Terminal, Flame, Eye } from "lucide-react";
+import { TrendingUp, TrendingDown, Info, Loader2, ArrowUpRight, Zap, Terminal, Flame, Eye } from "lucide-react";
 
 const formatBRL = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -83,15 +83,7 @@ export default function Dashboard() {
   const [data, setData] = useState<{ portfolio: any[]; suggestions: any[]; trending?: any[]; scanInterval?: number; logs?: any[]; userName?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Time states
-  const [now, setNow] = useState(new Date());
-  const [lastScan, setLastScan] = useState<Date | null>(null);
-  const [nextScan, setNextScan] = useState<Date | null>(null);
 
-  useEffect(() => {
-    const clockInterval = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(clockInterval);
-  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -107,8 +99,6 @@ export default function Dashboard() {
           setLoading(false);
 
           const ms = (json.scanInterval || 15) * 60 * 1000;
-          setLastScan(new Date());
-          setNextScan(new Date(Date.now() + ms));
 
           if (currentInterval) clearInterval(currentInterval);
           currentInterval = setInterval(fetchData, ms);
@@ -147,37 +137,7 @@ export default function Dashboard() {
 
       <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8 space-y-12">
 
-        {/* Superior Status Bar: Minimal & Informative */}
-        <section className="bg-slate-900 border border-slate-800 p-5 sm:p-6 rounded-3xl flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="flex items-center gap-4 w-full lg:w-auto">
-            <div className="p-3.5 bg-brand-500/10 rounded-2xl border border-brand-500/20 relative">
-              <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping" />
-              <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-slate-900" />
-              <Activity className="w-6 h-6 text-brand-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-lg font-black text-white tracking-tight">RAPERStock Dashboard ({data?.userName || "Investidor"})</h1>
-                <span className="px-2 py-0.5 bg-brand-500/10 text-brand-400 font-bold text-[10px] uppercase tracking-widest rounded-md border border-brand-500/20">
-                  v4.2.1
-                </span>
-              </div>
-              <p className="text-slate-400 text-sm font-medium mt-0.5">Dashboard & Escaneamento Automático</p>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 lg:flex lg:flex-row gap-4 w-full lg:w-auto bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80">
-            <div className="flex flex-col lg:items-end">
-              <span className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Horário Local</span>
-              <span className="text-lg sm:text-xl font-mono text-slate-100 font-bold">{now.toLocaleTimeString('pt-BR')}</span>
-            </div>
-            <div className="hidden lg:block w-px h-10 bg-slate-800"></div>
-            <div className="flex flex-col lg:items-end">
-              <span className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5" /> Atualização em</span>
-              <span className="text-lg sm:text-xl font-mono text-brand-400 font-bold">{nextScan ? nextScan.toLocaleTimeString('pt-BR') : '--:--:--'}</span>
-            </div>
-          </div>
-        </section>
 
         {/* --- SINAIS DA CARTEIRA --- */}
         <section>
