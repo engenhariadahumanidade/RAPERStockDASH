@@ -79,7 +79,7 @@ function SuggestionCard({ sug }: { sug: any }) {
 }
 
 export default function Dashboard() {
-  console.log("RAPERStockDASH - Versão 4.2.1 - MULTI-TENANT");
+  console.log("RAPERStockDASH - Versão 4.2.2 - MULTI-TENANT");
   const [data, setData] = useState<{ portfolio: any[]; suggestions: any[]; trending?: any[]; scanInterval?: number; logs?: any[]; userName?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
