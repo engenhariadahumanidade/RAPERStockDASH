@@ -3,8 +3,8 @@ import { sendWebhookMessage } from '@/lib/webhook';
 import crypto from 'crypto';
 import { StockAnalysis } from '@/lib/yahoo-finance';
 
-export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor") {
-    if (!settings?.webhookUrl || !settings?.phoneNumber || !settings.autoAlerts) {
+export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor", isTest: boolean = false) {
+    if (!settings?.webhookUrl || !settings?.phoneNumber || (!settings.autoAlerts && !isTest)) {
         return;
     }
 
@@ -22,14 +22,11 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     const minutes = now.getMinutes();
     const isCloseToNextHour = minutes >= 55;
 
-    // Duplicity prevention: Avoid sending multiple alerts too close together (cooldown 2 min)
+    // Duplicity prevention: Avoid sending multiple alerts too close together
     const lastAlertTime = settings.lastAlertTime ? new Date(settings.lastAlertTime) : null;
     const secondsSinceLast = lastAlertTime ? (now.getTime() - lastAlertTime.getTime()) / 1000 : 9999;
 
-    if (secondsSinceLast < 120) {
-        return; // Duplicate prevention
-    }
-
+    const isFirstTime = !lastAlertTime;
     const currentHourStart = new Date(now);
     currentHourStart.setMinutes(0, 0, 0);
 
@@ -37,33 +34,38 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     if (lastAlertHourNormalized) {
         lastAlertHourNormalized.setMinutes(0, 0, 0);
     }
-
-    const isFirstTime = !lastAlertTime;
     const isNewHour = !lastAlertHourNormalized || currentHourStart.getTime() > lastAlertHourNormalized.getTime();
 
-    // Priority Rule: If signals changed but we are close to the next hour, skip to wait for the full report.
-    if (!isNewHour && isChanged && isCloseToNextHour) {
-        await prisma.systemLog.create({
-            data: {
-                userId,
-                message: "⏳ Sinais detectados, porém postergados para o boletim da hora cheia (Faltam < 5min).",
-                level: "info"
-            }
-        });
-        return;
-    }
+    // Bypass rules for manual tests
+    if (!isTest) {
+        if (secondsSinceLast < 120) {
+            return; // Duplicate prevention
+        }
 
-    const shouldSend = isFirstTime || isNewHour || isChanged;
+        // Priority Rule: If signals changed but we are close to the next hour, skip to wait for the full report.
+        if (!isNewHour && isChanged && isCloseToNextHour) {
+            await prisma.systemLog.create({
+                data: {
+                    userId,
+                    message: "⏳ Sinais detectados, porém postergados para o boletim da hora cheia (Faltam < 5min).",
+                    level: "info"
+                }
+            });
+            return;
+        }
 
-    if (!shouldSend) {
-        await prisma.systemLog.create({
-            data: {
-                userId,
-                message: "✅ Varredura concluída. Sem sinais novos. Aguardando a próxima hora cheia.",
-                level: "info"
-            }
-        });
-        return;
+        const shouldSend = isFirstTime || isNewHour || isChanged;
+
+        if (!shouldSend) {
+            await prisma.systemLog.create({
+                data: {
+                    userId,
+                    message: "✅ Varredura concluída. Sem sinais novos. Aguardando a próxima hora cheia.",
+                    level: "info"
+                }
+            });
+            return;
+        }
     }
 
     // Prepare Extra Info
@@ -106,22 +108,38 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     // Prefix the greeting
     finalMsg = `Olá, *${userName}*! 👋\n\n${finalMsg}`;
 
+    if (isTest) {
+        finalMsg = `⚠️ *[TESTE DE DISPARO]* ⚠️\n\n${finalMsg}`;
+    }
+
     finalMsg += `\n\n⏰ Horário da Análise: ${now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`;
 
     const currentStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
     const inWorkingHours = currentStr >= (settings.workStart || "10:00") && currentStr <= (settings.workEnd || "19:00");
 
-    if (inWorkingHours) {
+    if (inWorkingHours || isTest) {
         try {
             await sendWebhookMessage(settings.webhookUrl, settings.phoneNumber, finalMsg);
-            await prisma.settings.update({
-                where: { id: settings.id },
-                data: { lastAlertHash: activeHash, lastAlertTime: now, lastAlertFullContent: finalMsg }
-            });
 
-            const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
-            const msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
-            await prisma.systemLog.create({ data: { userId, message: msgLog, level: "success" } });
+            // Don't update hash/time for tests to keep them independent
+            if (!isTest) {
+                await prisma.settings.update({
+                    where: { id: settings.id },
+                    data: { lastAlertHash: activeHash, lastAlertTime: now, lastAlertFullContent: finalMsg }
+                });
+
+                const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
+                const msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
+                await prisma.systemLog.create({ data: { userId, message: msgLog, level: "success" } });
+            } else {
+                await prisma.systemLog.create({
+                    data: {
+                        userId,
+                        message: "🧪 Disparo de teste manual enviado com sucesso.",
+                        level: "info"
+                    }
+                });
+            }
         } catch (e) {
             console.error("Falha ao enviar webhook", e);
             await prisma.systemLog.create({ data: { userId, message: "❌ Falha no disparador de Webhook.", level: "warning" } });

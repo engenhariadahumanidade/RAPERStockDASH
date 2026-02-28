@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { analyzeStock, getTopSuggestions, getTrendingStocks } from '@/lib/yahoo-finance';
 import { processAlerts } from '@/services/alert.service';
 
-export async function runDashboardAnalysis(userId: string, triggerAlert: boolean = false) {
+export async function runDashboardAnalysis(userId: string, triggerAlert: boolean = false, isTest: boolean = false) {
     if (!userId) {
         throw new Error("userId required for dashboard analysis");
     }
@@ -36,7 +36,7 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
 
     // 3. Send Alerts if requested
     if (triggerAlert && settings) {
-        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName);
+        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName, isTest);
     }
 
     // Fetch last 5 logs for user

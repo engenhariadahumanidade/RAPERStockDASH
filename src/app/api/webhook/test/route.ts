@@ -15,11 +15,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        // 1. Get real data using the logic from dashboard service
-        // This will fetch suggestions, trending, portfolio and apply current template
-        const data = await runDashboardAnalysis(userId, false);
-
-        // 2. We need the settings to get the webhook and the template
+        // 1. We need the settings to get the webhook and the template
         const settings = await prisma.settings.findUnique({ where: { userId } });
         if (!settings || !settings.webhookUrl || !settings.phoneNumber) {
             return NextResponse.json(
@@ -28,12 +24,10 @@ export async function POST(request: Request) {
             );
         }
 
-        // 3. Trigger the actual alert process but with the admin's context
-        // Instead of calling processAlerts manually (which might have deduplication logic),
-        // we call runDashboardAnalysis with triggerAlert=true which handles everything integrated.
-        // This ensures the template is processed with REAL CURRENT data.
-
-        await runDashboardAnalysis(userId, true);
+        // 2. Trigger the actual alert process but with the admin's context
+        // and identifying it as a test.
+        // triggerAlert=true, isTest=true
+        await runDashboardAnalysis(userId, true, true);
 
         return NextResponse.json({
             success: true,
