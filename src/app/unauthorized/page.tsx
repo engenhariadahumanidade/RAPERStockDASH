@@ -2,9 +2,20 @@
 
 import Navbar from "@/components/Navbar";
 import { ShieldAlert, LogIn } from "lucide-react";
-import { SignInButton } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
 
 export default function UnauthorizedPage() {
+    const { signOut } = useClerk();
+
+    const handleSwitchAccount = async () => {
+        await signOut();
+        // After sign out, the user will be redirected to the root or the sign-in page 
+        // depending on the clerk configuration. Usually, it's better to force a reload or 
+        // let Clerk's middleware handle the redirect since we are now at /unauthorized 
+        // which might be protected or not.
+        window.location.href = "/";
+    };
+
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
@@ -23,12 +34,13 @@ export default function UnauthorizedPage() {
                         Entre em contato com o administrador para solicitar a liberação do seu e-mail.
                     </p>
 
-                    <SignInButton mode="modal">
-                        <button className="flex items-center gap-2 px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black transition-all shadow-xl shadow-brand-500/20 active:scale-95">
-                            <LogIn className="w-5 h-5" />
-                            Tentar com outra conta
-                        </button>
-                    </SignInButton>
+                    <button
+                        onClick={handleSwitchAccount}
+                        className="flex items-center gap-2 px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black transition-all shadow-xl shadow-brand-500/20 active:scale-95"
+                    >
+                        <LogIn className="w-5 h-5" />
+                        Tentar com outra conta
+                    </button>
                 </div>
             </div>
         </div>
