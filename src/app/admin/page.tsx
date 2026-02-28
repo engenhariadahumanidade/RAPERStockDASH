@@ -137,7 +137,7 @@ export default function AdminPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                     {/* Left Column: Form & Pre-Allowed List */}
                     <div className="lg:col-span-1 space-y-8">
@@ -302,8 +302,8 @@ export default function AdminPage() {
                         </div>
                     </div>
 
-                    {/* Right Column: Registered Users List */}
-                    <div className="lg:col-span-1 glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col h-fit">
+                    {/* Bottom Section: Registered Users List */}
+                    <div className="lg:col-span-2 glass p-8 sm:p-10 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col h-fit mt-4">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-white">Usuários Cadastrados</h2>
                             <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-bold rounded-full">
@@ -325,23 +325,23 @@ export default function AdminPage() {
                                     const isAdmin = user.isAdmin;
 
                                     return (
-                                        <div key={user.id} className={`flex items-center justify-between p-4 bg-slate-900 border ${isAllowed ? 'border-brand-500/20 bg-brand-500/5' : 'border-slate-800'} rounded-2xl transition-all`}>
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-slate-200 font-bold max-w-[200px] sm:max-w-full truncate">
+                                        <div key={user.id} className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-slate-900 border ${isAllowed ? 'border-brand-500/20 bg-brand-500/5' : 'border-slate-800'} rounded-2xl transition-all`}>
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex flex-wrap items-center gap-3">
+                                                    <span className="text-slate-200 font-bold text-base sm:text-lg max-w-full truncate">
                                                         {user.email}
                                                     </span>
                                                     {isAdmin && (
-                                                        <span className="px-2 py-0.5 bg-brand-500 text-white text-[10px] uppercase font-black tracking-wider rounded">Admin</span>
+                                                        <span className="px-2.5 py-1 bg-brand-500 text-white text-[10px] uppercase font-black tracking-wider rounded-md">Admin</span>
                                                     )}
                                                     {!isAdmin && isAllowed && (
-                                                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-black tracking-wider rounded border border-emerald-500/20">Acesso Liberado</span>
+                                                        <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] uppercase font-black tracking-wider rounded-md border border-emerald-500/20">Acesso Liberado</span>
                                                     )}
                                                     {!isAdmin && !isAllowed && (
-                                                        <span className="px-2 py-0.5 bg-rose-500/10 text-rose-400 text-[10px] uppercase font-black tracking-wider rounded border border-rose-500/20">Bloqueado</span>
+                                                        <span className="px-2.5 py-1 bg-rose-500/10 text-rose-400 text-[10px] uppercase font-black tracking-wider rounded-md border border-rose-500/20">Bloqueado</span>
                                                     )}
                                                 </div>
-                                                <span className="text-xs text-slate-500 font-medium ml-1">
+                                                <span className="text-sm text-slate-500 font-medium ml-1">
                                                     Registrado em: {new Date(user.createdAt).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                                                 </span>
                                             </div>
@@ -350,7 +350,7 @@ export default function AdminPage() {
                                                 <button
                                                     onClick={() => handleToggleAccess(user.email, isAllowed)}
                                                     disabled={actionLoading}
-                                                    className={`px-4 py-2 flex items-center gap-2 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${isAllowed
+                                                    className={`w-full sm:w-auto px-5 py-2.5 flex justify-center items-center gap-2 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${isAllowed
                                                         ? "bg-slate-800 hover:bg-rose-500/10 hover:text-rose-500 text-slate-300 focus:ring-rose-500"
                                                         : "bg-brand-500 hover:bg-brand-600 text-white shadow-lg shadow-brand-500/20 focus:ring-brand-500"
                                                         }`}
@@ -358,12 +358,12 @@ export default function AdminPage() {
                                                     {isAllowed ? (
                                                         <>
                                                             <StopCircle className="w-4 h-4" />
-                                                            <span className="hidden sm:inline">Revogar</span>
+                                                            <span>Revogar Acesso</span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <PlayCircle className="w-4 h-4" />
-                                                            <span className="hidden sm:inline">Liberar Acesso</span>
+                                                            <span>Liberar Acesso</span>
                                                         </>
                                                     )}
                                                 </button>
