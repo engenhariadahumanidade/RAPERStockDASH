@@ -13,6 +13,7 @@ export default function AdminPage() {
     const [globalSettings, setGlobalSettings] = useState({ webhookUrl: '', scanInterval: 15, customMessage: '' });
     const [savingSettings, setSavingSettings] = useState(false);
     const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [testOneSignalStatus, setTestOneSignalStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
     const fetchUsersAndSettings = async () => {
         const [resUsers, resSettings] = await Promise.all([
@@ -112,6 +113,22 @@ export default function AdminPage() {
             }
         } catch {
             setTestStatus('error');
+        }
+    };
+
+    const handleTestOneSignal = async () => {
+        setTestOneSignalStatus('loading');
+        try {
+            const res = await fetch("/api/admin/test-onesignal", { method: "POST" });
+            const data = await res.json();
+            if (data.success) {
+                setTestOneSignalStatus('success');
+            } else {
+                setTestOneSignalStatus('error');
+                alert("Erro: " + (data.error || "Desconhecido"));
+            }
+        } catch {
+            setTestOneSignalStatus('error');
         }
     };
 
@@ -359,8 +376,8 @@ export default function AdminPage() {
                         </div>
 
                         <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl">
-                            <h3 className="text-lg font-bold text-white mb-2">Testar Disparo</h3>
-                            <p className="text-sm text-slate-400 mb-4">Envie uma notificação teste para o webhook master.</p>
+                            <h3 className="text-lg font-bold text-white mb-2">Disparo WhatsApp</h3>
+                            <p className="text-sm text-slate-400 mb-4">Envie uma notificação teste para o seu WhatsApp configurado via webhook.</p>
                             <button
                                 onClick={handleTestWebhook}
                                 disabled={testStatus === 'loading'}
@@ -372,6 +389,24 @@ export default function AdminPage() {
                                     <><CheckCircle2 className="w-4 h-4" /> Sucesso!</>
                                 ) : (
                                     <><Send className="w-4 h-4" /> Disparar Agora</>
+                                )}
+                            </button>
+                        </div>
+
+                        <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl mt-8">
+                            <h3 className="text-lg font-bold text-white mb-2">Testar OneSignal (Push)</h3>
+                            <p className="text-sm text-slate-400 mb-4">Envie uma notificação push teste para o seu próprio navegador ou celular.</p>
+                            <button
+                                onClick={handleTestOneSignal}
+                                disabled={testOneSignalStatus === 'loading'}
+                                className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20"
+                            >
+                                {testOneSignalStatus === 'loading' ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : testOneSignalStatus === 'success' ? (
+                                    <><CheckCircle2 className="w-4 h-4" /> Notificação Enviada!</>
+                                ) : (
+                                    <><Send className="w-4 h-4" /> Disparar Push</>
                                 )}
                             </button>
                         </div>
