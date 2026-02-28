@@ -303,7 +303,7 @@ export default function AdminPage() {
                     </div>
 
                     {/* Right Column: Registered Users List */}
-                    <div className="lg:col-span-1 glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col">
+                    <div className="lg:col-span-1 glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col h-fit">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-white">Usuários Cadastrados</h2>
                             <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-bold rounded-full">
