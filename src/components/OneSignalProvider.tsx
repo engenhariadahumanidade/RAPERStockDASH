@@ -24,6 +24,8 @@ export default function OneSignalProvider() {
                 await OneSignal.init({
                     appId,
                     allowLocalhostAsSecureOrigin: true, // Permite rodar e testar no localhost
+                    // @ts-ignore
+                    notifyButton: { enable: true },
                 });
 
                 // Exibe o prompt para pedir permissão ao usuário

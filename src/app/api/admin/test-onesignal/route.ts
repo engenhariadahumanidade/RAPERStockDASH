@@ -11,11 +11,10 @@ export async function POST() {
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user?.isAdmin) return new NextResponse("Unauthorized", { status: 401 });
 
-        // Envia notificação apenas para o próprio admin
+        // Envia notificação para todos os inscritos (broadcast de teste)
         const result = await sendPushNotification(
             "🚀 Notificação Push",
-            "A API do OneSignal está configurada e rodando 100% no seu servidor!",
-            [userId]
+            "A API do OneSignal está configurada e rodando 100% no seu servidor!"
         );
 
         if (!result.success) {
