@@ -1,10 +1,10 @@
-export async function sendPushNotification(title: string, message: string, userIds?: string[]) {
+export async function sendPushNotification(title: string, message: string, userIds?: string[]): Promise<{ success: boolean; error?: string }> {
     const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
     const restApiKey = process.env.ONESIGNAL_REST_API_KEY;
 
     if (!appId || !restApiKey) {
         console.warn("OneSignal credentials not configured.");
-        return false;
+        return { success: false, error: "Credenciais do OneSignal não configuradas." };
     }
 
     const payload: any = {
@@ -39,12 +39,18 @@ export async function sendPushNotification(title: string, message: string, userI
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`OneSignal API Error (${response.status}):`, errorText);
-            return false;
+            return { success: false, error: `HTTP ${response.status}: ${errorText}` };
         }
 
-        return true;
-    } catch (error) {
+        const data = await response.json();
+        if (data.errors && data.errors.length > 0) {
+            console.warn("OneSignal API returned logical errors:", data.errors);
+            return { success: false, error: data.errors.join(", ") };
+        }
+
+        return { success: true };
+    } catch (error: any) {
         console.error("Failed to send OneSignal push notification:", error);
-        return false;
+        return { success: false, error: error.message || "Erro desconhecido na requisição." };
     }
 }

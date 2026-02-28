@@ -26,6 +26,9 @@ export default function OneSignalProvider() {
                     allowLocalhostAsSecureOrigin: true, // Permite rodar e testar no localhost
                 });
 
+                // Exibe o prompt para pedir permissão ao usuário
+                OneSignal.Slidedown.promptPush();
+
                 setInitialized(true);
             } catch (error) {
                 console.error('Erro ao inicializar o OneSignal', error);

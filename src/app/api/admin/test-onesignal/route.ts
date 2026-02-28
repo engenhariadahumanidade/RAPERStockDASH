@@ -12,13 +12,17 @@ export async function POST() {
         if (!user?.isAdmin) return new NextResponse("Unauthorized", { status: 401 });
 
         // Envia notificação apenas para o próprio admin
-        const success = await sendPushNotification(
+        const result = await sendPushNotification(
             "🚀 Notificação Push",
             "A API do OneSignal está configurada e rodando 100% no seu servidor!",
             [userId]
         );
 
-        return NextResponse.json({ success });
+        if (!result.success) {
+            return NextResponse.json({ success: false, error: result.error });
+        }
+
+        return NextResponse.json({ success: true });
     } catch (e: any) {
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });
     }
