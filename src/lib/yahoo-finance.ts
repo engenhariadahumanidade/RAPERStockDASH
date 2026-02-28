@@ -8,7 +8,7 @@ export interface StockAnalysis {
     rsi: number;
     sma50: number;
     sma200: number;
-    action: 'Buy' | 'Venda' | 'Hold';
+    action: 'Compra' | 'Venda' | 'Hold';
     reason: string;
     dy: number;
     logo: string;
@@ -98,23 +98,23 @@ export async function analyzeStock(symbol: string): Promise<StockAnalysis | null
             dy = (totalDividends / price) * 100;
         }
 
-        let action: 'Buy' | 'Venda' | 'Hold' = 'Hold';
+        let action: 'Compra' | 'Venda' | 'Hold' = 'Hold';
         let reason = 'Mercado lateralizado, sem sinais claros.';
 
         if (rsi < 30 && price > sma200) {
-            action = 'Buy';
+            action = 'Compra';
             reason = 'Ativo sobrevendido (RSI < 30) em tendência de alta.';
         } else if (rsi > 70 && price < sma200) {
             action = 'Venda';
             reason = 'Ativo sobrecomprado (RSI > 70) em tendência de baixa.';
         } else if (sma50 > sma200 && rsi < 50) {
-            action = 'Buy';
+            action = 'Compra';
             reason = 'Golden Cross (SMA50 > SMA200) em correção (RSI < 50).';
         } else if (sma50 < sma200 && rsi > 50) {
             action = 'Venda';
             reason = 'Death Cross (SMA50 < SMA200) e possível topo local (RSI > 50).';
         } else if (rsi < 35) {
-            action = 'Buy';
+            action = 'Compra';
             reason = 'Ativo perto de sobrevenda extrema (RSI < 35).';
         } else if (rsi > 65) {
             action = 'Venda';
@@ -158,7 +158,7 @@ export async function getTopSuggestions(): Promise<StockAnalysis[]> {
         if (!analysis) return;
 
         // Rule 1: High Conviction (RSI < 30)
-        if (analysis.rsi < 32 && analysis.action === 'Buy') {
+        if (analysis.rsi < 32 && analysis.action === 'Compra') {
             analysis.reason = '💎 OPORTUNIDADE TÉCNICA: Ativo em sobrevenda extrema + RSI abaixo de 32.';
             results.push(analysis);
         }
