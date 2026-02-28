@@ -16,7 +16,12 @@ export async function GET() {
     const allowed = await prisma.allowedUser.findMany({
         orderBy: { createdAt: "desc" }
     });
-    return NextResponse.json(allowed);
+
+    const registeredUsers = await prisma.user.findMany({
+        orderBy: { createdAt: "desc" }
+    });
+
+    return NextResponse.json({ allowed, registeredUsers });
 }
 
 export async function POST(req: Request) {
@@ -54,11 +59,24 @@ export async function DELETE(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+    const emailToDelete = searchParams.get("email");
 
-    await prisma.allowedUser.delete({
-        where: { id: parseInt(id) }
-    });
+    if (!id && !emailToDelete) {
+        return NextResponse.json({ error: "ID or Email required" }, { status: 400 });
+    }
 
-    return NextResponse.json({ success: true });
+    try {
+        if (id) {
+            await prisma.allowedUser.delete({
+                where: { id: parseInt(id) }
+            });
+        } else if (emailToDelete) {
+            await prisma.allowedUser.delete({
+                where: { email: emailToDelete }
+            });
+        }
+        return NextResponse.json({ success: true });
+    } catch (e) {
+        return NextResponse.json({ error: "User not found or operation failed" }, { status: 400 });
+    }
 }
