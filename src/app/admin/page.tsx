@@ -10,7 +10,7 @@ export default function AdminPage() {
     const [registeredUsers, setRegisteredUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
-    const [globalSettings, setGlobalSettings] = useState({ webhookUrl: '', scanInterval: 15 });
+    const [globalSettings, setGlobalSettings] = useState({ webhookUrl: '', scanInterval: 15, customMessage: '' });
     const [savingSettings, setSavingSettings] = useState(false);
     const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -27,7 +27,8 @@ export default function AdminPage() {
         if (!settingsData.error) {
             setGlobalSettings({
                 webhookUrl: settingsData.webhookUrl || '',
-                scanInterval: settingsData.scanInterval || 15
+                scanInterval: settingsData.scanInterval || 15,
+                customMessage: settingsData.customMessage || "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação.",
             });
         }
         setLoading(false);
@@ -244,6 +245,22 @@ export default function AdminPage() {
                                         onChange={(e) => setGlobalSettings({ ...globalSettings, scanInterval: parseInt(e.target.value) || 15 })}
                                         className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                                        Template do Boletim
+                                    </label>
+                                    <textarea
+                                        rows={8}
+                                        required
+                                        value={globalSettings.customMessage}
+                                        onChange={(e) => setGlobalSettings({ ...globalSettings, customMessage: e.target.value })}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-xs font-mono"
+                                    />
+                                    <p className="text-[10px] text-slate-500 italic mt-1">
+                                        Variáveis: {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'}, {'{{highlights}}'}
+                                    </p>
                                 </div>
 
                                 <button

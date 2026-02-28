@@ -31,28 +31,7 @@ export default function Settings() {
             });
     }, []);
 
-    const handleSendLastBulletin = async () => {
-        setSendingLast(true);
-        try {
-            const res = await fetch("/api/webhook/test?forceLastBulletin=true", { method: "POST" });
-            const data = await res.json();
-            if (data.success) {
-                alert("Último relatório oficial enviado com sucesso!");
-            } else {
-                alert("Erro ao enviar: " + (data.error || "Desconhecido"));
-            }
-        } catch {
-            alert("Erro na conexão.");
-        } finally {
-            setSendingLast(false);
-        }
-    };
 
-    const handleLoadLastBulletin = () => {
-        if (lastAlertFullContent) {
-            setForm({ ...form, customMessage: lastAlertFullContent });
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -112,36 +91,6 @@ export default function Settings() {
                             />
                             <p className="text-xs text-slate-500 italic">Será enviado dentro do JSON payload para o webhook no formato: {`{ phone, msg }`}</p>
                         </div>
-
-                        <div className="space-y-3 pt-4 border-t border-slate-700/50">
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
-                                    Mensagem de Alerta (Template)
-                                </label>
-                                {lastAlertFullContent && (
-                                    <button
-                                        type="button"
-                                        onClick={handleSendLastBulletin}
-                                        disabled={sendingLast}
-                                        className="text-[10px] font-bold bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 px-3 py-1 rounded-lg border border-brand-500/30 transition-all uppercase tracking-tight flex items-center gap-2 shadow-sm active:scale-95 disabled:opacity-50"
-                                    >
-                                        {sendingLast ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-                                        Enviar último relatório agora
-                                    </button>
-                                )}
-                            </div>
-                            <textarea
-                                rows={8}
-                                value={form.customMessage}
-                                onChange={e => setForm({ ...form, customMessage: e.target.value })}
-                                className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-sm"
-                            />
-                            <p className="text-xs text-slate-500 italic block mt-1">
-                                Use as variáveis {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'} e {'{{highlights}}'} onde desejar que o conteúdo flua.
-                            </p>
-                        </div>
-
-
 
                         <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-700/50">
                             <div className="space-y-3">
