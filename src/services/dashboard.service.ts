@@ -2,12 +2,16 @@ import prisma from '@/lib/prisma';
 import { analyzeStock, getTopSuggestions, getTrendingStocks } from '@/lib/yahoo-finance';
 import { processAlerts } from '@/services/alert.service';
 
-export async function runDashboardAnalysis(triggerAlert: boolean = false) {
+export async function runDashboardAnalysis(userId: string, triggerAlert: boolean = false) {
+    if (!userId) {
+        throw new Error("userId required for dashboard analysis");
+    }
+
     // 1. Fetch initial requirements concurrently
     const [portfolio, suggestions, settings, trending] = await Promise.all([
-        prisma.stock.findMany(),
+        prisma.stock.findMany({ where: { userId } }),
         getTopSuggestions(),
-        prisma.settings.findFirst(),
+        prisma.settings.findUnique({ where: { userId } }),
         getTrendingStocks()
     ]);
 
@@ -27,12 +31,13 @@ export async function runDashboardAnalysis(triggerAlert: boolean = false) {
     );
 
     // 3. Send Alerts if requested
-    if (triggerAlert) {
-        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio);
+    if (triggerAlert && settings) {
+        await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId);
     }
 
-    // Fetch last 5 logs
-    const logs = await (prisma as any).systemLog.findMany({
+    // Fetch last 5 logs for user
+    const logs = await prisma.systemLog.findMany({
+        where: { userId },
         orderBy: { createdAt: 'desc' },
         take: 5
     });

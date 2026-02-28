@@ -79,7 +79,7 @@ function SuggestionCard({ sug }: { sug: any }) {
 }
 
 export default function Dashboard() {
-  console.log("RAPERStockDASH - Versão 3.1.0 - NOVO DESIGN");
+  console.log("RAPERStockDASH - Versão 4.0.0 - MULTI-TENANT");
   const [data, setData] = useState<{ portfolio: any[]; suggestions: any[]; trending?: any[]; scanInterval?: number; logs?: any[] } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -159,7 +159,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-3">
                 <h1 className="text-lg font-black text-white tracking-tight">RAPERStock Engine</h1>
                 <span className="px-2 py-0.5 bg-brand-500/10 text-brand-400 font-bold text-[10px] uppercase tracking-widest rounded-md border border-brand-500/20">
-                  v3.1.0
+                  v4.0.0
                 </span>
               </div>
               <p className="text-slate-400 text-sm font-medium mt-0.5">Escaneamento Automático Ativo</p>

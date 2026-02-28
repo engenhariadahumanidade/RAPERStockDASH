@@ -10,15 +10,21 @@ datasource db {
 
 model Stock {
   id           Int      @id @default(autoincrement())
-  symbol       String   @unique
+  symbol       String
   quantity     Float    @default(0)
   averagePrice Float    @default(0)
+  userId       String   // Relacionamento com o usuário logado
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@unique([userId, symbol]) // O mesmo usuário não pode ter ações duplicadas, mas vários podem ter a mesma
 }
 
 model Settings {
   id            Int      @id @default(autoincrement())
+  userId        String   @unique // Um settings por conta
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   webhookUrl    String   @default("")
   phoneNumber   String   @default("")
   autoAlerts    Boolean  @default(true)
@@ -34,6 +40,8 @@ model Settings {
 
 model SystemLog {
   id        Int      @id @default(autoincrement())
+  userId    String   // Log individual por conta
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   message   String
   level     String   @default("info") // info, warning, success
   createdAt DateTime @default(now())
@@ -45,6 +53,9 @@ model User {
   isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  stocks    Stock[]
+  settings  Settings? // Relacionamento opcional 1-1
+  logs      SystemLog[]
 }
 
 model AllowedUser {

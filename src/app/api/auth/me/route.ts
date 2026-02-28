@@ -25,7 +25,13 @@ export async function GET() {
             const dbUser = await prisma.user.upsert({
                 where: { id: userId },
                 update: { email },
-                create: { id: userId, email }
+                create: {
+                    id: userId,
+                    email,
+                    settings: {
+                        create: {} // Automatically creates default settings
+                    }
+                }
             });
             if (dbUser.isAdmin) isAdmin = true;
             isAllowed = isAdmin;

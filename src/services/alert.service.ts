@@ -3,7 +3,7 @@ import { sendWebhookMessage } from '@/lib/webhook';
 import crypto from 'crypto';
 import { StockAnalysis } from '@/lib/yahoo-finance';
 
-export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = []) {
+export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string) {
     if (!settings?.webhookUrl || !settings?.phoneNumber || !settings.autoAlerts) {
         return;
     }
@@ -43,8 +43,9 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     // Priority Rule: If signals changed but we are close to the next hour, skip to wait for the full report.
     if (!isNewHour && isChanged && isCloseToNextHour) {
-        await (prisma as any).systemLog.create({
+        await prisma.systemLog.create({
             data: {
+                userId,
                 message: "⏳ Sinais detectados, porém postergados para o boletim da hora cheia (Faltam < 5min).",
                 level: "info"
             }
@@ -55,8 +56,9 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     const shouldSend = isFirstTime || isNewHour || isChanged;
 
     if (!shouldSend) {
-        await (prisma as any).systemLog.create({
+        await prisma.systemLog.create({
             data: {
+                userId,
                 message: "✅ Varredura concluída. Sem sinais novos. Aguardando a próxima hora cheia.",
                 level: "info"
             }
@@ -108,17 +110,17 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     if (inWorkingHours) {
         try {
             await sendWebhookMessage(settings.webhookUrl, settings.phoneNumber, finalMsg);
-            await (prisma as any).settings.update({
+            await prisma.settings.update({
                 where: { id: settings.id },
                 data: { lastAlertHash: activeHash, lastAlertTime: now, lastAlertFullContent: finalMsg }
             });
 
             const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
             const msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
-            await (prisma as any).systemLog.create({ data: { message: msgLog, level: "success" } });
+            await prisma.systemLog.create({ data: { userId, message: msgLog, level: "success" } });
         } catch (e) {
             console.error("Falha ao enviar webhook", e);
-            await (prisma as any).systemLog.create({ data: { message: "❌ Falha no disparador de Webhook.", level: "warning" } });
+            await prisma.systemLog.create({ data: { userId, message: "❌ Falha no disparador de Webhook.", level: "warning" } });
         }
     }
 }
