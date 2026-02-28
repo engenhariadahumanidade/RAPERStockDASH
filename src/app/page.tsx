@@ -72,7 +72,7 @@ function SuggestionCard({ sug }: { sug: any }) {
 }
 
 export default function Dashboard() {
-  console.log("RAPERStockDASH - Versão Diagnóstico 3.0.0 - VERIFICAR DEPLOY");
+  console.log("RAPERStockDASH - Versão Diagnóstico 3.0.1 - VERIFICAR DEPLOY");
   const [data, setData] = useState<{ portfolio: any[]; suggestions: any[]; trending?: any[]; scanInterval?: number; logs?: any[] } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -158,7 +158,7 @@ export default function Dashboard() {
           <div>
             <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
               Status do Sistema
-              <span className="text-[10px] bg-brand-500/20 text-brand-400 px-1.5 py-0.5 rounded border border-brand-500/30">v3.0.0</span>
+              <span className="text-[10px] bg-brand-500/20 text-brand-400 px-1.5 py-0.5 rounded border border-brand-500/30">v3.0.1</span>
             </h3>
             <p className="text-white font-medium flex items-center gap-2">
               Escaneamento Automático Ativo
