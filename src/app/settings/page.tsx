@@ -7,6 +7,7 @@ import { Link as LinkIcon, Phone, Save, Loader2, Send, CheckCircle2 } from "luci
 export default function Settings() {
     const [form, setForm] = useState({ webhookUrl: '', phoneNumber: '', autoAlerts: true, customMessage: '', scanInterval: 15, workStart: '10:00', workEnd: '19:00' });
     const [lastAlertFullContent, setLastAlertFullContent] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -27,6 +28,7 @@ export default function Settings() {
                         workEnd: data.workEnd || '19:00'
                     });
                     setLastAlertFullContent(data.lastAlertFullContent || null);
+                    if (data.isAdmin) setIsAdmin(true);
                 }
                 setLoading(false);
             });
@@ -109,24 +111,26 @@ export default function Settings() {
                         <span className="p-3 bg-slate-800 rounded-2xl border border-slate-700 shadow-inner">
                             <LinkIcon className="w-6 h-6 text-brand-400" />
                         </span>
-                        Integração Webhook
+                        Configurações de Alertas
                     </h2>
-                    <p className="text-slate-400 mb-8 relative z-10 text-lg">Configure o envio das análises para o seu bot (ex: Typebot, Evolution API, N8N, Zapier).</p>
+                    <p className="text-slate-400 mb-8 relative z-10 text-lg">Configure o envio das análises para o seu destino.</p>
 
                     <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                        <div className="space-y-3">
-                            <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
-                                <LinkIcon className="w-4 h-4 text-brand-500" />
-                                URL do Webhook
-                            </label>
-                            <input
-                                type="url"
-                                placeholder="https://seu-dominio.com/webhook"
-                                value={form.webhookUrl}
-                                onChange={e => setForm({ ...form, webhookUrl: e.target.value })}
-                                className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
-                            />
-                        </div>
+                        {isAdmin && (
+                            <div className="space-y-3">
+                                <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                    <LinkIcon className="w-4 h-4 text-brand-500" />
+                                    URL do Webhook (Admin)
+                                </label>
+                                <input
+                                    type="url"
+                                    placeholder="https://seu-dominio.com/webhook"
+                                    value={form.webhookUrl}
+                                    onChange={e => setForm({ ...form, webhookUrl: e.target.value })}
+                                    className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
+                                />
+                            </div>
+                        )}
 
                         <div className="space-y-3 pt-2">
                             <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
@@ -171,20 +175,22 @@ export default function Settings() {
                             </p>
                         </div>
 
-                        <div className="space-y-3 pt-4 border-t border-slate-700/50">
-                            <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
-                                Frequência de Verificação (Minutos)
-                            </label>
-                            <input
-                                type="number"
-                                min="1"
-                                placeholder="15"
-                                value={form.scanInterval === 0 ? '' : form.scanInterval}
-                                onChange={e => setForm({ ...form, scanInterval: e.target.value === '' ? 0 : parseInt(e.target.value) })}
-                                className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
-                            />
-                            <p className="text-xs text-slate-500 italic block mt-1">Ao deixar a Dashboard aberta, ela vai processar as análises nesse intervalo de minutos. Se Auto Alertas ativado, irá disparar pro bot se houver sinal.</p>
-                        </div>
+                        {isAdmin && (
+                            <div className="space-y-3 pt-4 border-t border-slate-700/50">
+                                <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                                    Frequência de Verificação (Minutos) - Admin
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    placeholder="15"
+                                    value={form.scanInterval === 0 ? '' : form.scanInterval}
+                                    onChange={e => setForm({ ...form, scanInterval: e.target.value === '' ? 0 : parseInt(e.target.value) })}
+                                    className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
+                                />
+                                <p className="text-xs text-slate-500 italic block mt-1">Ao deixar a Dashboard aberta, ela vai processar as análises nesse intervalo de minutos. Se Auto Alertas ativado, irá disparar pro bot se houver sinal.</p>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-700/50">
                             <div className="space-y-3">
@@ -238,27 +244,29 @@ export default function Settings() {
                     </form>
 
                     {/* Test Action */}
-                    <div className="mt-12 pt-10 border-t border-slate-700/50 relative z-10">
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
-                            <div>
-                                <h3 className="text-xl font-bold text-white">Testar Conexão</h3>
-                                <p className="text-sm text-slate-400 mt-1">Envie uma mensagem de teste para o Webhook configurado</p>
+                    {isAdmin && (
+                        <div className="mt-12 pt-10 border-t border-slate-700/50 relative z-10">
+                            <div className="flex flex-col sm:flex-row justify-between items-center gap-6 bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">Testar Conexão Webhook (Admin)</h3>
+                                    <p className="text-sm text-slate-400 mt-1">Envie uma mensagem de teste para o Webhook configurado</p>
+                                </div>
+                                <button
+                                    onClick={handleTestWebhook}
+                                    disabled={testStatus === 'loading'}
+                                    className="w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20"
+                                >
+                                    {testStatus === 'loading' ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : testStatus === 'success' ? (
+                                        <><CheckCircle2 className="w-5 h-5" /> Teste OK!</>
+                                    ) : (
+                                        <><Send className="w-5 h-5" /> Disparar Teste</>
+                                    )}
+                                </button>
                             </div>
-                            <button
-                                onClick={handleTestWebhook}
-                                disabled={testStatus === 'loading'}
-                                className="w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-indigo-500/20"
-                            >
-                                {testStatus === 'loading' ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : testStatus === 'success' ? (
-                                    <><CheckCircle2 className="w-5 h-5" /> Teste OK!</>
-                                ) : (
-                                    <><Send className="w-5 h-5" /> Disparar Teste</>
-                                )}
-                            </button>
                         </div>
-                    </div>
+                    )}
 
                 </div>
             </div>

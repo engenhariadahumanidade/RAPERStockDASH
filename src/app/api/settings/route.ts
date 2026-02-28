@@ -8,6 +8,9 @@ export async function GET() {
         const { userId } = await auth();
         if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+        const isAdmin = dbUser?.isAdmin || false;
+
         let settings = await prisma.settings.findUnique({ where: { userId } });
         if (!settings) {
             settings = await prisma.settings.create({
@@ -21,7 +24,8 @@ export async function GET() {
                 },
             });
         }
-        return NextResponse.json(settings);
+
+        return NextResponse.json({ ...settings, isAdmin });
     } catch (error) {
         return NextResponse.json({ error: 'Erro ao carregar configurações' }, { status: 500 });
     }
@@ -32,12 +36,25 @@ export async function POST(request: Request) {
         const { userId } = await auth();
         if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+        const isAdmin = dbUser?.isAdmin || false;
+
         const { webhookUrl, phoneNumber, autoAlerts, customMessage, scanInterval, workStart, workEnd } = await request.json();
+
+        const updateData: any = { phoneNumber, autoAlerts, customMessage, scanInterval, workStart, workEnd };
+        if (isAdmin && webhookUrl !== undefined) {
+            updateData.webhookUrl = webhookUrl;
+        }
+
+        const createData: any = {
+            userId, phoneNumber, autoAlerts, customMessage, scanInterval, workStart, workEnd,
+            webhookUrl: isAdmin ? (webhookUrl || "") : ""
+        };
 
         const settings = await prisma.settings.upsert({
             where: { userId },
-            update: { webhookUrl, phoneNumber, autoAlerts, customMessage, scanInterval, workStart, workEnd },
-            create: { userId, webhookUrl, phoneNumber, autoAlerts, customMessage, scanInterval, workStart, workEnd },
+            update: updateData,
+            create: createData,
         });
 
         return NextResponse.json(settings);
