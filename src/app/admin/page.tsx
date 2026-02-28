@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Users, UserPlus, ShieldCheck, Mail, Loader2, PlayCircle, StopCircle, UserX, ShieldAlert } from "lucide-react";
+import { Users, UserPlus, ShieldCheck, Mail, Loader2, PlayCircle, StopCircle, UserX, ShieldAlert, Link as LinkIcon, Save, Send, CheckCircle2 } from "lucide-react";
 
 export default function AdminPage() {
     const [email, setEmail] = useState("");
@@ -10,17 +10,31 @@ export default function AdminPage() {
     const [registeredUsers, setRegisteredUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+    const [globalSettings, setGlobalSettings] = useState({ webhookUrl: '', scanInterval: 15 });
+    const [savingSettings, setSavingSettings] = useState(false);
+    const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-    const fetchUsers = async () => {
-        const res = await fetch("/api/admin/allowed-users");
-        const data = await res.json();
+    const fetchUsersAndSettings = async () => {
+        const [resUsers, resSettings] = await Promise.all([
+            fetch("/api/admin/allowed-users"),
+            fetch("/api/admin/global-settings")
+        ]);
+        const data = await resUsers.json();
+        const settingsData = await resSettings.json();
+
         setAllowedUsers(data.allowed || []);
         setRegisteredUsers(data.registeredUsers || []);
+        if (!settingsData.error) {
+            setGlobalSettings({
+                webhookUrl: settingsData.webhookUrl || '',
+                scanInterval: settingsData.scanInterval || 15
+            });
+        }
         setLoading(false);
     };
 
     useEffect(() => {
-        fetchUsers();
+        fetchUsersAndSettings();
     }, []);
 
     const handleAdd = async (e: React.FormEvent) => {
@@ -31,7 +45,7 @@ export default function AdminPage() {
             body: JSON.stringify({ email }),
         });
         setEmail("");
-        await fetchUsers();
+        await fetchUsersAndSettings();
         setActionLoading(false);
     };
 
@@ -55,7 +69,7 @@ export default function AdminPage() {
                 body: JSON.stringify({ email: userEmail }),
             });
         }
-        await fetchUsers();
+        await fetchUsersAndSettings();
         setActionLoading(false);
     };
 
@@ -63,8 +77,41 @@ export default function AdminPage() {
         if (!confirm(`Remover pré-autorização de ${userEmail}?`)) return;
         setActionLoading(true);
         await fetch(`/api/admin/allowed-users?id=${id}`, { method: "DELETE" });
-        await fetchUsers();
+        await fetchUsersAndSettings();
         setActionLoading(false);
+    };
+
+    const handleSaveSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSavingSettings(true);
+        try {
+            await fetch("/api/admin/global-settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(globalSettings),
+            });
+            alert("Configurações Globais Atualizadas!");
+        } catch {
+            alert("Erro ao salvar.");
+        } finally {
+            setSavingSettings(false);
+        }
+    };
+
+    const handleTestWebhook = async () => {
+        setTestStatus('loading');
+        try {
+            const res = await fetch("/api/webhook/test", { method: "POST" });
+            const data = await res.json();
+            if (data.success) {
+                setTestStatus('success');
+            } else {
+                setTestStatus('error');
+                alert("Erro: " + (data.error || "Desconhecido"));
+            }
+        } catch {
+            setTestStatus('error');
+        }
     };
 
     // Pre-calculate derived state
@@ -162,8 +209,75 @@ export default function AdminPage() {
                         </div>
                     </div>
 
+                    {/* Middle Column: Global Settings */}
+                    <div className="lg:col-span-1 space-y-8">
+                        <div className="glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl h-fit">
+                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                                <LinkIcon className="w-5 h-5 text-brand-400" />
+                                Webhook Central
+                            </h2>
+                            <p className="text-sm text-slate-400 mb-6">Configurações globais que valem para o disparo do sistema todo e o timer.</p>
+
+                            <form onSubmit={handleSaveSettings} className="space-y-4">
+                                <div>
+                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                                        URL do Webhook Master
+                                    </label>
+                                    <input
+                                        type="url"
+                                        required
+                                        value={globalSettings.webhookUrl}
+                                        onChange={(e) => setGlobalSettings({ ...globalSettings, webhookUrl: e.target.value })}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                                        Scan Loop (Minutos)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="1"
+                                        value={globalSettings.scanInterval}
+                                        onChange={(e) => setGlobalSettings({ ...globalSettings, scanInterval: parseInt(e.target.value) || 15 })}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={savingSettings}
+                                    className="w-full mt-2 py-3 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                                >
+                                    {savingSettings ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    Salvar Configs
+                                </button>
+                            </form>
+                        </div>
+
+                        <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl">
+                            <h3 className="text-lg font-bold text-white mb-2">Testar Disparo</h3>
+                            <p className="text-sm text-slate-400 mb-4">Envie uma notificação teste para o webhook master.</p>
+                            <button
+                                onClick={handleTestWebhook}
+                                disabled={testStatus === 'loading'}
+                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
+                            >
+                                {testStatus === 'loading' ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : testStatus === 'success' ? (
+                                    <><CheckCircle2 className="w-4 h-4" /> Sucesso!</>
+                                ) : (
+                                    <><Send className="w-4 h-4" /> Disparar Agora</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
                     {/* Right Column: Registered Users List */}
-                    <div className="lg:col-span-2 glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col h-full min-h-[500px]">
+                    <div className="lg:col-span-1 glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col h-full min-h-[500px]">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-white">Usuários Cadastrados</h2>
                             <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-bold rounded-full">
@@ -211,8 +325,8 @@ export default function AdminPage() {
                                                     onClick={() => handleToggleAccess(user.email, isAllowed)}
                                                     disabled={actionLoading}
                                                     className={`px-4 py-2 flex items-center gap-2 rounded-xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${isAllowed
-                                                            ? "bg-slate-800 hover:bg-rose-500/10 hover:text-rose-500 text-slate-300 focus:ring-rose-500"
-                                                            : "bg-brand-500 hover:bg-brand-600 text-white shadow-lg shadow-brand-500/20 focus:ring-brand-500"
+                                                        ? "bg-slate-800 hover:bg-rose-500/10 hover:text-rose-500 text-slate-300 focus:ring-rose-500"
+                                                        : "bg-brand-500 hover:bg-brand-600 text-white shadow-lg shadow-brand-500/20 focus:ring-brand-500"
                                                         }`}
                                                 >
                                                     {isAllowed ? (
