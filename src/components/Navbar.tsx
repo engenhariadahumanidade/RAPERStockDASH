@@ -25,8 +25,8 @@ export default function Navbar() {
                 <div className="p-2 bg-gradient-to-tr from-brand-600 to-brand-500 rounded-xl shadow-lg shadow-brand-500/20">
                     <Activity className="w-6 h-6 text-white" />
                 </div>
-                <h1 className="text-xl font-bold tracking-tight text-white hidden md:block">
-                    RAPERStock <span className="text-brand-400">Dashboard</span>
+                <h1 className="text-xl font-bold tracking-tight text-white hidden lg:block">
+                    RAPERStock <span className="text-brand-400">Dashboard ({clerkUser?.emailAddresses[0]?.emailAddress?.split('@')[0] || "Investidor"})</span>
                 </h1>
             </div>
 
