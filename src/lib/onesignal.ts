@@ -16,7 +16,7 @@ export async function sendPushNotification(title: string, message: string, userI
         app_id: appId,
         headings: { en: title, pt: title },
         contents: { en: message, pt: message },
-        url: process.env.NEXT_PUBLIC_APP_URL || "https://raperstockdash.vercel.app/dashboard",
+        url: process.env.NEXT_PUBLIC_APP_URL || "https://raper-stock-dash.vercel.app/dashboard",
     };
 
     if (userIds && userIds.length > 0) {
