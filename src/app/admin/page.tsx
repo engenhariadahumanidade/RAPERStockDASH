@@ -14,6 +14,8 @@ export default function AdminPage() {
     const [savingSettings, setSavingSettings] = useState(false);
     const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [testOneSignalStatus, setTestOneSignalStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [oneSignalResult, setOneSignalResult] = useState<any>(null);
+    const [oneSignalDiag, setOneSignalDiag] = useState<any>(null);
 
     const fetchUsersAndSettings = async () => {
         const [resUsers, resSettings] = await Promise.all([
@@ -37,6 +39,11 @@ export default function AdminPage() {
 
     useEffect(() => {
         fetchUsersAndSettings();
+        // Auto-diagnose OneSignal on page load
+        fetch("/api/admin/test-onesignal")
+            .then(r => r.json())
+            .then(d => setOneSignalDiag(d))
+            .catch(() => { });
     }, []);
 
     const handleAdd = async (e: React.FormEvent) => {
@@ -118,16 +125,14 @@ export default function AdminPage() {
 
     const handleTestOneSignal = async () => {
         setTestOneSignalStatus('loading');
+        setOneSignalResult(null);
         try {
             const res = await fetch("/api/admin/test-onesignal", { method: "POST" });
             const data = await res.json();
-            if (data.success) {
-                setTestOneSignalStatus('success');
-            } else {
-                setTestOneSignalStatus('error');
-                alert("Erro: " + (data.error || "Desconhecido"));
-            }
-        } catch {
+            setOneSignalResult(data);
+            setTestOneSignalStatus(data.success ? 'success' : 'error');
+        } catch (err: any) {
+            setOneSignalResult({ error: err.message });
             setTestOneSignalStatus('error');
         }
     };
@@ -397,12 +402,22 @@ export default function AdminPage() {
                             <h3 className="text-lg font-bold text-white mb-2">Testar OneSignal (Push)</h3>
                             <p className="text-sm text-slate-400 mb-4">Envie uma notificação push teste para o seu próprio navegador ou celular.</p>
 
-                            {!process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID && (
-                                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
-                                    <p className="text-xs text-red-400 font-bold">⚠️ ATENÇÃO: A variável `NEXT_PUBLIC_ONESIGNAL_APP_ID` não foi encontrada na Vercel!</p>
-                                    <p className="text-[10px] text-red-400/80 mt-1">O botão não funcionará e o prompt não aparecerá para seus usuários até você configurar essa chave na aba Environment Variables da Vercel e fazer um Redeploy.</p>
+                            {/* Diagnostic Info */}
+                            {oneSignalDiag && (
+                                <div className={`mb-4 p-4 rounded-xl border text-xs space-y-1 ${oneSignalDiag.appIdConfigured && oneSignalDiag.restApiKeyConfigured
+                                    ? 'bg-emerald-500/10 border-emerald-500/30'
+                                    : 'bg-red-500/10 border-red-500/30'
+                                    }`}>
+                                    <p className="font-bold text-white text-sm mb-2">🔍 Diagnóstico (Env Vars na Vercel):</p>
+                                    <p className={oneSignalDiag.appIdConfigured ? 'text-emerald-400' : 'text-red-400'}>
+                                        {oneSignalDiag.appIdConfigured ? '✅' : '❌'} NEXT_PUBLIC_ONESIGNAL_APP_ID: {oneSignalDiag.appIdConfigured ? oneSignalDiag.appIdPreview : 'NÃO CONFIGURADA'}
+                                    </p>
+                                    <p className={oneSignalDiag.restApiKeyConfigured ? 'text-emerald-400' : 'text-red-400'}>
+                                        {oneSignalDiag.restApiKeyConfigured ? '✅' : '❌'} ONESIGNAL_REST_API_KEY: {oneSignalDiag.restApiKeyConfigured ? oneSignalDiag.restApiKeyPreview : 'NÃO CONFIGURADA'}
+                                    </p>
                                 </div>
                             )}
+
                             <button
                                 onClick={handleTestOneSignal}
                                 disabled={testOneSignalStatus === 'loading'}
@@ -416,6 +431,33 @@ export default function AdminPage() {
                                     <><Send className="w-4 h-4" /> Disparar Push</>
                                 )}
                             </button>
+
+                            {/* Test Result Details */}
+                            {oneSignalResult && (
+                                <div className={`mt-4 p-4 rounded-xl border text-xs font-mono ${oneSignalResult.success
+                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                                    : 'bg-red-500/10 border-red-500/30 text-red-300'
+                                    }`}>
+                                    <p className="font-bold text-sm mb-2 font-sans">
+                                        {oneSignalResult.success ? '✅ Sucesso!' : '❌ Falha no Envio'}
+                                    </p>
+                                    {oneSignalResult.notificationId && (
+                                        <p>📌 Notification ID: {oneSignalResult.notificationId}</p>
+                                    )}
+                                    {oneSignalResult.recipients !== null && oneSignalResult.recipients !== undefined && (
+                                        <p>👥 Recipients: {oneSignalResult.recipients}</p>
+                                    )}
+                                    {oneSignalResult.error && (
+                                        <p className="text-red-400">⚠️ Erro: {oneSignalResult.error}</p>
+                                    )}
+                                    {oneSignalResult.rawResponse && (
+                                        <details className="mt-2">
+                                            <summary className="cursor-pointer text-slate-400 hover:text-white transition-colors font-sans text-sm">Ver resposta completa</summary>
+                                            <pre className="mt-2 whitespace-pre-wrap text-[10px] text-slate-400 overflow-auto max-h-40">{JSON.stringify(oneSignalResult.rawResponse, null, 2)}</pre>
+                                        </details>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 

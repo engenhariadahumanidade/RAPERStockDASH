@@ -10,45 +10,59 @@ export default function OneSignalProvider() {
 
     useEffect(() => {
         async function initOneSignal() {
-            // Avoid initializing multiple times
             if (initialized) return;
 
             const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 
             if (!appId) {
-                console.warn('OneSignal App ID não configurado.');
+                console.warn('[OneSignal Client] App ID não configurado. Verifique NEXT_PUBLIC_ONESIGNAL_APP_ID.');
                 return;
             }
+
+            console.log('[OneSignal Client] Inicializando com appId:', appId.substring(0, 8) + '...');
 
             try {
                 await OneSignal.init({
                     appId,
-                    allowLocalhostAsSecureOrigin: true, // Permite rodar e testar no localhost
+                    allowLocalhostAsSecureOrigin: true,
                     // @ts-ignore
                     notifyButton: { enable: true },
                 });
 
-                // Exibe o prompt para pedir permissão ao usuário
-                OneSignal.Slidedown.promptPush();
+                console.log('[OneSignal Client] ✅ SDK inicializado com sucesso');
+
+                // Check current permission
+                const permission = Notification.permission;
+                console.log('[OneSignal Client] Browser Notification Permission:', permission);
+
+                if (permission === 'default') {
+                    console.log('[OneSignal Client] Pedindo permissão ao usuário...');
+                    OneSignal.Slidedown.promptPush();
+                } else if (permission === 'denied') {
+                    console.warn('[OneSignal Client] ⚠️ Notificações BLOQUEADAS pelo browser! O usuário precisa liberar nas configurações do navegador.');
+                } else {
+                    console.log('[OneSignal Client] ✅ Permissão já concedida');
+                }
 
                 setInitialized(true);
             } catch (error) {
-                console.error('Erro ao inicializar o OneSignal', error);
+                console.error('[OneSignal Client] ❌ Erro ao inicializar:', error);
             }
         }
 
         initOneSignal();
     }, [initialized]);
 
-    // Handle User Id Mapping
     useEffect(() => {
         if (initialized && isLoaded && userId) {
-            // Quando o usuário loga e o Clerk tem o ID, vinculamos no OneSignal
-            OneSignal.login(userId).catch(err => console.error("OneSignal login error", err));
+            console.log('[OneSignal Client] Fazendo login com userId:', userId);
+            OneSignal.login(userId).catch(err => console.error("[OneSignal Client] Login error:", err));
         } else if (initialized && isLoaded && !userId) {
-            OneSignal.logout().catch(err => console.error("OneSignal logout error", err));
+            console.log('[OneSignal Client] Fazendo logout (sem userId)');
+            OneSignal.logout().catch(err => console.error("[OneSignal Client] Logout error:", err));
         }
     }, [initialized, isLoaded, userId]);
 
-    return null; // Este componente não renderiza nada visualmente por si mesmo (apenas scripts do OneSignal e o sino injetado)
+    return null;
 }
+
