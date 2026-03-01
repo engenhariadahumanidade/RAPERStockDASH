@@ -60,7 +60,7 @@ export default function Navbar() {
                             <span className="text-brand-400">({clerkUser?.emailAddresses[0]?.emailAddress?.split('@')[0] || "Investidor"})</span>
                         </h1>
                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-1 sm:mt-0.5">
-                            v4.3.0 • Dashboard & Escaneamento
+                            v4.3.1 • Dashboard & Escaneamento
                         </p>
                     </div>
                 </div>

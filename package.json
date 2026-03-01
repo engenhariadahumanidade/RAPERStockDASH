@@ -1,7 +1,7 @@
 {
   "description": "RAPERStock Wealth Dashboard - Stock Scanning & Portfolio Monitoring",
   "name": "raper-stock-dash",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
