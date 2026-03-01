@@ -41,8 +41,8 @@ export default function AdminPage() {
         fetchUsersAndSettings();
         // Auto-diagnose OneSignal on page load
         fetch("/api/admin/test-onesignal")
-            .then(r => r.json())
-            .then(d => setOneSignalDiag(d))
+            .then(r => r.ok ? r.json() : null)
+            .then(d => { if (d) setOneSignalDiag(d); })
             .catch(() => { });
     }, []);
 
@@ -128,6 +128,12 @@ export default function AdminPage() {
         setOneSignalResult(null);
         try {
             const res = await fetch("/api/admin/test-onesignal", { method: "POST" });
+            if (!res.ok) {
+                const text = await res.text();
+                setOneSignalResult({ error: `HTTP ${res.status}: ${text}` });
+                setTestOneSignalStatus('error');
+                return;
+            }
             const data = await res.json();
             setOneSignalResult(data);
             setTestOneSignalStatus(data.success ? 'success' : 'error');
