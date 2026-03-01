@@ -82,8 +82,8 @@ export default function Navbar() {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto pt-3 sm:pt-2 lg:pt-0 border-t border-slate-800 lg:border-0 relative">
-                <div className="flex w-full overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 justify-start sm:justify-center gap-2 custom-scrollbar no-scrollbar scroll-smooth pr-6 sm:pr-0">
+            <div className="flex flex-col sm:flex-row items-center sm:items-stretch gap-3 w-full lg:w-auto pt-3 sm:pt-2 lg:pt-0 border-t border-slate-800 lg:border-0 relative">
+                <div className="flex flex-col sm:flex-row w-full lg:w-auto pb-2 sm:pb-0 justify-start sm:justify-center gap-2">
                     {navs.map((nav) => {
                         const isActive = pathname === nav.href;
                         const Icon = nav.icon;
@@ -91,7 +91,7 @@ export default function Navbar() {
                             <Link
                                 key={nav.name}
                                 href={nav.href}
-                                className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all duration-300 font-bold text-xs whitespace-nowrap
+                                className={`flex items-center justify-center sm:justify-start gap-2 px-4 py-3 sm:py-2 rounded-xl transition-all duration-300 font-bold text-sm sm:text-xs whitespace-nowrap
                         ${isActive
                                         ? 'bg-slate-700/60 text-white shadow-inner border border-slate-600 cursor-default'
                                         : 'text-slate-400 hover:text-white hover:bg-slate-800/80 cursor-pointer'}
