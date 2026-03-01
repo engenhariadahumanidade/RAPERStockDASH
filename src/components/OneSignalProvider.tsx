@@ -25,7 +25,6 @@ export default function OneSignalProvider() {
                 await OneSignal.init({
                     appId,
                     allowLocalhostAsSecureOrigin: true,
-                    // @ts-ignore
                     promptOptions: {
                         slidedown: {
                             prompts: [{
@@ -39,6 +38,10 @@ export default function OneSignalProvider() {
                                 },
                             }],
                         },
+                    },
+                    welcomeNotification: {
+                        title: "RAPERStock 🚀",
+                        message: "Notificações ativadas! Você receberá alertas de mercado em tempo real.",
                     },
                     notifyButton: {
                         enable: true,
@@ -65,16 +68,12 @@ export default function OneSignalProvider() {
 
                 console.log('[OneSignal Client] ✅ SDK inicializado com sucesso');
 
-                // Check current permission
                 const permission = Notification.permission;
                 console.log('[OneSignal Client] Browser Notification Permission:', permission);
 
-                if (permission === 'default') {
-                    console.log('[OneSignal Client] Pedindo permissão ao usuário...');
-                    OneSignal.Slidedown.promptPush();
-                } else if (permission === 'denied') {
+                if (permission === 'denied') {
                     console.warn('[OneSignal Client] ⚠️ Notificações BLOQUEADAS pelo browser! O usuário precisa liberar nas configurações do navegador.');
-                } else {
+                } else if (permission === 'granted') {
                     console.log('[OneSignal Client] ✅ Permissão já concedida');
                 }
 

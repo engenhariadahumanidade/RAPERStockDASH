@@ -15,6 +15,9 @@ export async function GET() {
         return NextResponse.json({
             webhookUrl: settings?.webhookUrl || '',
             scanInterval: settings?.scanInterval || 15,
+            workStart: settings?.workStart || '10:00',
+            workEnd: settings?.workEnd || '19:00',
+            masterSwitch: settings?.masterSwitch ?? true,
             customMessage: settings?.customMessage || "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação.",
         });
     } catch (error) {
@@ -31,14 +34,21 @@ export async function POST(request: Request) {
         const isMasterAdmin = dbUser?.email.toLowerCase() === "engenhariadahumanidade@gmail.com" || dbUser?.email === process.env.ADMIN_EMAIL;
         if (!dbUser?.isAdmin && !isMasterAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-        const { webhookUrl, scanInterval, customMessage } = await request.json();
+        const { webhookUrl, scanInterval, customMessage, workStart, workEnd, masterSwitch } = await request.json();
 
         // Update ALL settings
         await prisma.settings.updateMany({
-            data: { webhookUrl, scanInterval, customMessage }
+            data: {
+                webhookUrl,
+                scanInterval,
+                customMessage,
+                workStart,
+                workEnd,
+                masterSwitch
+            }
         });
 
-        return NextResponse.json({ success: true, webhookUrl, scanInterval, customMessage });
+        return NextResponse.json({ success: true, webhookUrl, scanInterval, customMessage, workStart, workEnd, masterSwitch });
     } catch (error) {
         return NextResponse.json({ error: 'Erro ao salvar configurações globais' }, { status: 500 });
     }

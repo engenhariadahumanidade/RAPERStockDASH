@@ -35,6 +35,7 @@ model Settings {
   lastAlertFullContent String?
   workStart     String   @default("10:00")
   workEnd       String   @default("19:00")
+  masterSwitch  Boolean  @default(true)
   updatedAt     DateTime @updatedAt
 }
 

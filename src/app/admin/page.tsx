@@ -10,7 +10,14 @@ export default function AdminPage() {
     const [registeredUsers, setRegisteredUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
-    const [globalSettings, setGlobalSettings] = useState({ webhookUrl: '', scanInterval: 15, customMessage: '' });
+    const [globalSettings, setGlobalSettings] = useState({
+        webhookUrl: '',
+        scanInterval: 15,
+        customMessage: '',
+        workStart: '10:00',
+        workEnd: '19:00',
+        masterSwitch: true
+    });
     const [savingSettings, setSavingSettings] = useState(false);
     const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [testOneSignalStatus, setTestOneSignalStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -31,6 +38,9 @@ export default function AdminPage() {
             setGlobalSettings({
                 webhookUrl: settingsData.webhookUrl || '',
                 scanInterval: settingsData.scanInterval || 15,
+                workStart: settingsData.workStart || '10:00',
+                workEnd: settingsData.workEnd || '19:00',
+                masterSwitch: settingsData.masterSwitch ?? true,
                 customMessage: settingsData.customMessage || "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação.",
             });
         }
@@ -342,6 +352,47 @@ export default function AdminPage() {
                                         onChange={(e) => setGlobalSettings({ ...globalSettings, scanInterval: parseInt(e.target.value) || 15 })}
                                         className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
                                     />
+                                </div>
+
+                                <div className="p-4 bg-slate-900 border border-slate-700/50 rounded-2xl flex items-center justify-between mt-4">
+                                    <div>
+                                        <label className="text-sm font-bold text-white block">Motor Principal (Master Switch)</label>
+                                        <p className="text-[11px] text-slate-400 mt-1">Habilita ou desabilita totalmente o scan e envios do sistema.</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setGlobalSettings({ ...globalSettings, masterSwitch: !globalSettings.masterSwitch })}
+                                        className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${globalSettings.masterSwitch ? 'bg-emerald-500' : 'bg-slate-700'}`}
+                                    >
+                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out ${globalSettings.masterSwitch ? 'translate-x-8 shadow-[0_0_10px_rgba(16,185,129,0.8)]' : 'translate-x-1'}`} />
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                                            Hora de Início
+                                        </label>
+                                        <input
+                                            type="time"
+                                            required
+                                            value={globalSettings.workStart}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, workStart: e.target.value })}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                                            Hora de Fim
+                                        </label>
+                                        <input
+                                            type="time"
+                                            required
+                                            value={globalSettings.workEnd}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, workEnd: e.target.value })}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="pt-4 border-t border-slate-700/50 mt-4">

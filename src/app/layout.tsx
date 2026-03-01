@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/nextjs';
 import RoleGuardClient from '@/components/RoleGuardClient';
 import OneSignalProvider from '@/components/OneSignalProvider';
+import BackgroundScanner from '@/components/BackgroundScanner';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -28,6 +29,7 @@ export default function RootLayout({
           <div className="min-h-screen relative flex flex-col">
             <main className="flex-1 w-full max-w-[1600px] mx-auto p-4 md:p-8 relative z-10">
               <SignedIn>
+                <BackgroundScanner />
                 <RoleGuardClient>
                   {children}
                 </RoleGuardClient>
