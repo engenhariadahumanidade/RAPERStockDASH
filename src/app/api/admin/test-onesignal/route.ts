@@ -38,7 +38,8 @@ export async function POST() {
 
         const result = await sendPushNotification(
             "🚀 Notificação Push",
-            "A API do OneSignal está configurada e rodando 100% no seu servidor!"
+            "A API do OneSignal está configurada e rodando 100% no seu servidor!",
+            [userId]
         );
 
         return NextResponse.json({
