@@ -6,10 +6,11 @@ import { sendPushNotification } from "@/lib/onesignal";
 export async function GET() {
     try {
         const { userId } = await auth();
-        if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+        if (!userId) return NextResponse.json({ error: "Sessão não encontrada (Clerk userId vazio)" }, { status: 401 });
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (!user?.isAdmin) return new NextResponse("Unauthorized", { status: 401 });
+        if (!user) return NextResponse.json({ error: `Usuário ${userId} não encontrado no banco` }, { status: 401 });
+        if (!user.isAdmin) return NextResponse.json({ error: `Usuário ${userId} não é admin` }, { status: 403 });
 
         return NextResponse.json({
             appIdConfigured: !!process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
@@ -29,10 +30,11 @@ export async function GET() {
 export async function POST() {
     try {
         const { userId } = await auth();
-        if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+        if (!userId) return NextResponse.json({ success: false, error: "Sessão não encontrada (Clerk userId vazio)" }, { status: 401 });
 
         const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (!user?.isAdmin) return new NextResponse("Unauthorized", { status: 401 });
+        if (!user) return NextResponse.json({ success: false, error: `Usuário ${userId} não encontrado no banco` }, { status: 401 });
+        if (!user.isAdmin) return NextResponse.json({ success: false, error: `Usuário ${userId} não é admin` }, { status: 403 });
 
         const result = await sendPushNotification(
             "🚀 Notificação Push",
@@ -50,4 +52,3 @@ export async function POST() {
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });
     }
 }
-

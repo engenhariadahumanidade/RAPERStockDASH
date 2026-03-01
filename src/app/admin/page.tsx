@@ -128,12 +128,6 @@ export default function AdminPage() {
         setOneSignalResult(null);
         try {
             const res = await fetch("/api/admin/test-onesignal", { method: "POST" });
-            if (!res.ok) {
-                const text = await res.text();
-                setOneSignalResult({ error: `HTTP ${res.status}: ${text}` });
-                setTestOneSignalStatus('error');
-                return;
-            }
             const data = await res.json();
             setOneSignalResult(data);
             setTestOneSignalStatus(data.success ? 'success' : 'error');
