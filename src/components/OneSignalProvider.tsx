@@ -26,7 +26,41 @@ export default function OneSignalProvider() {
                     appId,
                     allowLocalhostAsSecureOrigin: true,
                     // @ts-ignore
-                    notifyButton: { enable: true },
+                    promptOptions: {
+                        slidedown: {
+                            prompts: [{
+                                type: "push",
+                                autoPrompt: true,
+                                delay: { pageViews: 1, timeDelay: 3 },
+                                text: {
+                                    actionMessage: "Deseja receber alertas de mercado e sinais da sua carteira em tempo real?",
+                                    acceptButton: "Sim, quero!",
+                                    cancelButton: "Agora não",
+                                },
+                            }],
+                        },
+                    },
+                    notifyButton: {
+                        enable: true,
+                        size: 'medium',
+                        prenotify: true,
+                        showCredit: false,
+                        text: {
+                            'tip.state.unsubscribed': 'Ativar notificações',
+                            'tip.state.subscribed': 'Notificações ativadas',
+                            'tip.state.blocked': 'Notificações bloqueadas',
+                            'message.prenotify': 'Clique para receber alertas de mercado',
+                            'message.action.subscribed': 'Obrigado por ativar!',
+                            'message.action.subscribing': 'Ativando...',
+                            'message.action.resubscribed': 'Notificações reativadas!',
+                            'message.action.unsubscribed': 'Você não receberá mais notificações.',
+                            'dialog.main.title': 'Gerenciar Notificações',
+                            'dialog.main.button.subscribe': 'ATIVAR',
+                            'dialog.main.button.unsubscribe': 'DESATIVAR',
+                            'dialog.blocked.title': 'Desbloquear Notificações',
+                            'dialog.blocked.message': 'Siga as instruções para liberar notificações no seu navegador.',
+                        },
+                    },
                 });
 
                 console.log('[OneSignal Client] ✅ SDK inicializado com sucesso');
