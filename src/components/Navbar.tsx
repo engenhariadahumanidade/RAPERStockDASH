@@ -56,10 +56,10 @@ export default function Navbar() {
                     </div>
                     <div className="flex flex-col">
                         <h1 className="text-sm font-black tracking-tight text-white whitespace-nowrap">
-                            RAPERStock PRO Dashboard <span className="text-brand-400">({clerkUser?.emailAddresses[0]?.emailAddress?.split('@')[0] || "Investidor"})</span>
+                            RAPERStock Dashboard <span className="text-brand-400">({clerkUser?.emailAddresses[0]?.emailAddress?.split('@')[0] || "Investidor"})</span>
                         </h1>
                         <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-0.5">
-                            v4.2.5 • Dashboard & Escaneamento
+                            v4.3.0 • Dashboard & Escaneamento
                         </p>
                     </div>
                 </div>
