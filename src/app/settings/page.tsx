@@ -60,25 +60,25 @@ export default function Settings() {
     );
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-[80vh] bg-transparent pb-16">
             <Navbar />
 
-            <div className="flex-1 w-full max-w-3xl mx-auto space-y-8 mt-4">
-                <div className="glass p-8 sm:p-12 rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden">
+            <div className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 space-y-8 mt-4">
+                <div className="glass p-5 sm:p-8 lg:p-12 rounded-2xl sm:rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden">
 
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-[80px]" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-[80px] pointer-events-none" />
 
-                    <h2 className="text-3xl font-extrabold text-white mb-2 relative z-10 flex items-center gap-3">
-                        <span className="p-3 bg-slate-800 rounded-2xl border border-slate-700 shadow-inner">
-                            <LinkIcon className="w-6 h-6 text-brand-400" />
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 relative z-10 flex items-center gap-3 tracking-tight">
+                        <span className="p-2 sm:p-3 bg-slate-900 border border-white/10 rounded-xl sm:rounded-2xl shadow-inner">
+                            <LinkIcon className="w-5 h-5 sm:w-6 sm:h-6 text-brand-400" />
                         </span>
                         Configurações de Alertas
                     </h2>
-                    <p className="text-slate-400 mb-8 relative z-10 text-lg">Personalize como e quando você recebe os boletins da sua carteira.</p>
+                    <p className="text-slate-400 mb-6 sm:mb-8 relative z-10 text-sm sm:text-lg">Personalize como e quando você recebe os boletins da sua carteira.</p>
 
                     <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                        <div className="space-y-3 pt-2">
-                            <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                        <div className="space-y-2 sm:space-y-3 pt-2">
+                            <label className="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                 <Phone className="w-4 h-4 text-brand-500" />
                                 Número de Telefone (Destino)
                             </label>
@@ -87,56 +87,56 @@ export default function Settings() {
                                 placeholder="5511999999999"
                                 value={form.phoneNumber}
                                 onChange={e => setForm({ ...form, phoneNumber: e.target.value })}
-                                className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
+                                className="w-full bg-slate-900 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-sm text-base sm:text-lg"
                             />
-                            <p className="text-xs text-slate-500 italic">Será enviado dentro do JSON payload para o webhook no formato: {`{ phone, msg }`}</p>
+                            <p className="text-[10px] sm:text-xs text-slate-500 italic">Será enviado dentro do JSON para o webhook: {`{ phone, msg }`}</p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-700/50">
-                            <div className="space-y-3">
-                                <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-4 border-t border-white/5">
+                            <div className="space-y-2 sm:space-y-3">
+                                <label className="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     Horário Início
                                 </label>
                                 <input
                                     type="time"
                                     value={form.workStart}
                                     onChange={e => setForm({ ...form, workStart: e.target.value })}
-                                    className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
+                                    className="w-full bg-slate-900 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-sm text-base sm:text-lg"
                                 />
                             </div>
-                            <div className="space-y-3">
-                                <label className="text-sm font-semibold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                            <div className="space-y-2 sm:space-y-3">
+                                <label className="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     Horário Fim
                                 </label>
                                 <input
                                     type="time"
                                     value={form.workEnd}
                                     onChange={e => setForm({ ...form, workEnd: e.target.value })}
-                                    className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-inner text-lg"
+                                    className="w-full bg-slate-900 border border-white/10 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-mono shadow-sm text-base sm:text-lg"
                                 />
                             </div>
                         </div>
-                        <p className="text-xs text-slate-500 italic block mt-1">Neste período, o sistema envia o 1º boletim ao conectar, e de hora em hora caso não passe por nenhuma alteração.</p>
+                        <p className="text-[10px] sm:text-xs text-slate-500 italic block mt-1">Neste período, o sistema envia o 1º boletim ao conectar, e de hora em hora caso não passe por nenhuma alteração.</p>
 
-                        <div className="flex items-center gap-4 py-4 bg-slate-900/50 p-5 rounded-2xl border border-slate-800">
+                        <div className="flex items-start sm:items-center gap-3 sm:gap-4 py-3 sm:py-4 bg-slate-900/40 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-white/5 shadow-sm mt-4">
                             <input
                                 type="checkbox"
                                 id="auto"
                                 checked={form.autoAlerts}
                                 onChange={e => setForm({ ...form, autoAlerts: e.target.checked })}
-                                className="w-6 h-6 rounded border-slate-700 text-brand-600 focus:ring-brand-500 bg-slate-800"
+                                className="w-5 h-5 sm:w-6 sm:h-6 mt-1 sm:mt-0 rounded border-slate-700 text-brand-600 focus:ring-brand-500 bg-slate-800 shrink-0"
                             />
                             <div>
-                                <label htmlFor="auto" className="text-white font-bold text-lg cursor-pointer">Auto Alertas</label>
-                                <p className="text-sm text-slate-400">Permitir envio automático ao analisar carteira quando houver sinais fortes de setup.</p>
+                                <label htmlFor="auto" className="text-white font-bold text-base sm:text-lg cursor-pointer block select-none">Auto Alertas</label>
+                                <p className="text-xs sm:text-sm text-slate-400 leading-snug">Permitir envio automático quando houver sinais fortes na análise da carteira.</p>
                             </div>
                         </div>
 
-                        <div className="pt-6 flex flex-col sm:flex-row gap-4">
+                        <div className="pt-4 sm:pt-6">
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-500/25 active:scale-95 text-lg"
+                                className="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3.5 sm:py-4 rounded-xl sm:rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-brand-500/25 active:scale-95 text-base sm:text-lg"
                             >
                                 {saving ? <Loader2 className="w-6 h-6 animate-spin" /> : <><Save className="w-6 h-6" /> Salvar Configurações</>}
                             </button>

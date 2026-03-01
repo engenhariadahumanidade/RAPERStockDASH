@@ -18,8 +18,9 @@ function SuggestionCard({ sug }: { sug: any }) {
   const themeColor = isDividend ? 'amber' : isTechnical ? 'emerald' : 'blue';
 
   return (
-    <div className="bg-slate-900 border border-slate-700/60 p-5 sm:p-6 rounded-3xl hover:border-slate-500 transition-all group relative overflow-hidden flex flex-col justify-between h-full shadow-2xl">
-      <div className={`absolute top-0 left-0 w-full h-1.5 bg-${themeColor}-500/80 group-hover:bg-${themeColor}-400 transition-colors`} />
+    <div className="glass border border-white/5 p-4 sm:p-6 rounded-2xl hover:border-white/10 transition-all group relative overflow-hidden flex flex-col justify-between h-full shadow-2xl">
+      <div className={`absolute top-0 left-0 w-full h-1 bg-${themeColor}-500/80 group-hover:bg-${themeColor}-400 transition-colors opacity-70`} />
+      <div className={`absolute inset-0 bg-gradient-to-br from-${themeColor}-500/5 to-transparent pointer-events-none opacity-50`}></div>
 
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-3 sm:gap-4">
@@ -58,16 +59,16 @@ function SuggestionCard({ sug }: { sug: any }) {
           {sug.reason}
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-          <div className="bg-slate-950/80 p-3 sm:p-4 rounded-2xl border border-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 relative z-10">
+          <div className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5">
             <span className="text-slate-500 text-[10px] sm:text-xs uppercase font-bold tracking-widest block mb-1">Preço Atual</span>
             <span className="text-white font-mono text-base sm:text-lg font-black">{formatBRL(sug.price)}</span>
           </div>
-          <div className="bg-slate-950/80 p-3 sm:p-4 rounded-2xl border border-slate-800">
+          <div className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5">
             <span className="text-slate-500 text-[10px] sm:text-xs uppercase font-bold tracking-widest block mb-1">RSI (14)</span>
             <span className={`font-mono text-base sm:text-lg font-black ${sug.rsi < 35 ? 'text-emerald-400' : 'text-slate-300'}`}>{sug.rsi.toFixed(1)}</span>
           </div>
-          <div className="bg-slate-950/80 p-3 sm:p-4 rounded-2xl border border-slate-800 md:col-span-1 col-span-2">
+          <div className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5 md:col-span-1 col-span-2">
             <span className="text-slate-500 text-[10px] sm:text-xs uppercase font-bold tracking-widest block mb-1">Div. Yield</span>
             <span className="text-amber-400 font-mono text-base sm:text-lg font-black">{sug.dy.toFixed(2)}%</span>
           </div>
@@ -117,24 +118,24 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen bg-slate-950">
+      <div className="flex flex-col min-h-[80vh] bg-transparent">
         <Navbar />
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
-          <Loader2 className="w-16 h-16 text-emerald-500 animate-spin mb-6" />
-          <h2 className="text-2xl font-bold tracking-tight text-white animate-pulse">
+        <div className="flex-1 flex flex-col items-center justify-center p-4">
+          <Loader2 className="w-16 h-16 text-emerald-500 animate-spin mb-6 drop-shadow-lg" />
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white animate-pulse text-center">
             Analisando mercado e sua carteira...
           </h2>
-          <p className="text-slate-400 mt-2 font-medium">Buscando os melhores ativos e dados em tempo real</p>
+          <p className="text-slate-400 mt-2 font-medium text-center text-sm sm:text-base">Buscando os melhores ativos e dados em tempo real</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 pb-24">
+    <div className="flex flex-col min-h-screen bg-transparent pb-16 sm:pb-24">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8 space-y-12">
+      <main className="max-w-7xl mx-auto w-full px-0 sm:px-4 lg:px-8 space-y-10 sm:space-y-12">
 
 
 
@@ -147,8 +148,8 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 gap-5">
             {data?.portfolio.length === 0 && (
-              <div className="bg-slate-900 border border-slate-800 p-12 rounded-3xl flex flex-col items-center justify-center text-center">
-                <Info className="w-16 h-16 text-slate-600 mb-6" />
+              <div className="glass border border-white/5 p-8 sm:p-12 rounded-2xl lg:rounded-[32px] flex flex-col items-center justify-center text-center shadow-xl">
+                <Info className="w-16 h-16 text-slate-500 mb-6 drop-shadow-md" />
                 <p className="text-white font-bold text-xl md:text-2xl mb-2 tracking-tight">Sem ativos monitorados</p>
                 <p className="text-slate-400 md:text-lg max-w-md">Gerencie sua carteira adicionando ações na página &quot;Minha Carteira&quot; para obter análises em tempo real.</p>
               </div>
@@ -157,8 +158,9 @@ export default function Dashboard() {
             {data?.portfolio.map((item, idx) => {
               const info = item.analysis;
               if (!info) return (
-                <div key={idx} className="bg-slate-900 border border-rose-500/30 p-6 sm:p-8 rounded-3xl shadow-xl">
-                  <div className="flex items-center gap-4 mb-3">
+                <div key={idx} className="glass border border-rose-500/20 p-5 sm:p-8 rounded-2xl lg:rounded-[32px] shadow-xl relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-rose-500/5 to-transparent pointer-events-none"></div>
+                  <div className="flex flex-wrap items-center gap-4 mb-3 relative z-10">
                     <h3 className="text-2xl font-black text-slate-300 tracking-tighter">{item.symbol}</h3>
                     <span className="px-3 py-1 bg-rose-500/10 text-rose-400 font-bold text-[10px] uppercase tracking-widest rounded-md border border-rose-500/20">Sem Dados</span>
                   </div>
@@ -169,9 +171,10 @@ export default function Dashboard() {
               const isBuy = info.action === "Buy";
               const isSell = info.action === "Venda";
 
-              const borderColor = isBuy ? "border-emerald-500/40" : isSell ? "border-rose-500/40" : "border-slate-700/60";
-              const bgColor = isBuy ? "bg-emerald-500/5 hover:bg-emerald-500/10" : isSell ? "bg-rose-500/5 hover:bg-rose-500/10" : "bg-slate-900 hover:bg-slate-800";
+              const borderColor = isBuy ? "border-emerald-500/20" : isSell ? "border-rose-500/20" : "border-white/5";
+              const bgColor = "glass";
               const indicatorColor = isBuy ? "bg-emerald-500" : isSell ? "bg-rose-500" : "bg-slate-500";
+              const gradientColor = isBuy ? "from-emerald-500/5" : isSell ? "from-rose-500/5" : "from-slate-500/5";
               const badgeColor = isBuy ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : isSell ? "text-rose-400 bg-rose-500/10 border-rose-500/20" : "text-amber-400 bg-amber-500/10 border-amber-500/20";
 
               const totalCost = item.quantity * item.averagePrice;
@@ -181,10 +184,11 @@ export default function Dashboard() {
               const isProfit = profitLoss >= 0;
 
               return (
-                <div key={idx} className={`relative p-6 sm:p-8 rounded-3xl border transition-all duration-300 ${borderColor} ${bgColor} shadow-2xl overflow-hidden group`}>
-                  <div className={`absolute top-0 left-0 w-1.5 h-full ${indicatorColor} opacity-80`} />
+                <div key={idx} className={`relative p-5 sm:p-8 rounded-2xl sm:rounded-[32px] border transition-all duration-300 ${borderColor} ${bgColor} shadow-2xl overflow-hidden group`}>
+                  <div className={`absolute inset-0 bg-gradient-to-b ${gradientColor} to-transparent pointer-events-none opacity-50 z-0`}></div>
+                  <div className={`absolute top-0 left-0 w-1.5 h-full ${indicatorColor} opacity-80 z-10 shadow-[0_0_10px_currentColor]`} />
 
-                  <div className="flex flex-col xl:flex-row justify-between items-start gap-6 sm:gap-8">
+                  <div className="flex flex-col xl:flex-row justify-between items-start gap-5 sm:gap-8 relative z-10 w-full">
                     <div className="w-full xl:w-1/2">
                       <div className="flex flex-wrap items-center gap-4 mb-3">
                         <a href={`https://statusinvest.com.br/acoes/${item.symbol.replace('.SA', '').toLowerCase()}`} target="_blank" rel="noopener noreferrer" className="text-3xl sm:text-4xl font-black text-white tracking-tighter hover:text-brand-400 transition-colors">
@@ -199,18 +203,18 @@ export default function Dashboard() {
                       </p>
                     </div>
 
-                    <div className="w-full xl:w-auto grid grid-cols-2 md:grid-cols-4 xl:flex xl:flex-row gap-4 sm:gap-6 pt-6 xl:pt-0 border-t xl:border-t-0 border-slate-800/80 mt-2 xl:mt-0">
-                      <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800">
+                    <div className="w-full xl:w-auto grid grid-cols-2 md:grid-cols-4 xl:flex xl:flex-row gap-3 sm:gap-6 pt-5 xl:pt-0 border-t xl:border-t-0 border-white/5 mt-2 xl:mt-0">
+                      <div className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5">
                         <span className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest block mb-1">Preço Atual</span>
-                        <span className="text-white font-mono text-lg sm:text-xl font-black">{formatBRL(info.price)}</span>
+                        <span className="text-white font-mono text-base sm:text-xl font-black">{formatBRL(info.price)}</span>
                       </div>
-                      <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800">
+                      <div className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5">
                         <span className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest block mb-1">RSI (14)</span>
-                        <span className={`font-mono text-lg sm:text-xl font-black ${info.rsi < 30 ? 'text-emerald-400' : info.rsi > 70 ? 'text-rose-400' : 'text-slate-300'}`}>
+                        <span className={`font-mono text-base sm:text-xl font-black ${info.rsi < 30 ? 'text-emerald-400' : info.rsi > 70 ? 'text-rose-400' : 'text-slate-300'}`}>
                           {info.rsi.toFixed(1)}
                         </span>
                       </div>
-                      <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800 md:col-span-2 xl:col-span-1 min-w-[180px]">
+                      <div className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5 md:col-span-2 xl:col-span-1 min-w-[150px] sm:min-w-[180px]">
                         <span className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest block mb-1">Sua Performance</span>
                         <div className="flex items-baseline gap-2">
                           <span className={`text-lg sm:text-xl font-black font-mono tracking-tight ${isProfit ? 'text-emerald-400' : 'text-rose-400'}`}>
@@ -245,9 +249,9 @@ export default function Dashboard() {
               Top Oportunidades do Scanner
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
               {data?.suggestions.length === 0 && (
-                <div className="col-span-1 md:col-span-2 p-8 bg-slate-900 border border-slate-800 rounded-3xl text-center">
+                <div className="col-span-1 md:col-span-2 p-6 sm:p-8 glass border border-white/5 rounded-2xl lg:rounded-[32px] text-center shadow-xl">
                   <p className="text-slate-400 font-medium">Nenhuma oportunidade forte detectada no momento.</p>
                 </div>
               )}
@@ -263,42 +267,45 @@ export default function Dashboard() {
               Ações em Alta Tensão
             </h2>
 
-            <div className="bg-slate-900 p-6 rounded-3xl border border-orange-500/20 hover:border-orange-500/40 transition-colors shadow-2xl flex flex-col gap-4">
-              {(!data?.trending || data.trending.length === 0) ? (
-                <p className="text-slate-400 text-sm font-medium">Mercado estável. Nenhuma distorção grave encontrada.</p>
-              ) : (
-                data.trending.map((trend, idx) => (
-                  <div key={idx} className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 flex flex-row items-center justify-between">
-                    <div className="flex items-center gap-3 w-1/2">
-                      {trend.logo ? (
-                        <img src={trend.logo} alt={trend.symbol} className="w-8 h-8 rounded-full bg-white p-0.5 shrink-0" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 font-bold text-xs flex items-center justify-center shrink-0 text-slate-400">{trend.symbol.charAt(0)}</div>
-                      )}
-                      <a href={`https://statusinvest.com.br/acoes/${trend.symbol.replace('.SA', '').toLowerCase()}`} target="_blank" rel="noopener noreferrer" className="font-black text-lg text-white hover:text-orange-400 transition-colors truncate">
-                        {trend.symbol}
-                      </a>
-                    </div>
+            <div className="glass p-5 sm:p-6 rounded-2xl lg:rounded-[32px] border border-orange-500/20 hover:border-orange-500/40 transition-colors shadow-2xl flex flex-col gap-3 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 to-transparent pointer-events-none z-0"></div>
+              <div className="relative z-10 w-full flex flex-col gap-3">
+                {(!data?.trending || data.trending.length === 0) ? (
+                  <p className="text-slate-400 text-sm font-medium">Mercado estável. Nenhuma distorção grave encontrada.</p>
+                ) : (
+                  data.trending.map((trend, idx) => (
+                    <div key={idx} className="bg-slate-950/40 p-3 sm:p-4 rounded-xl border border-white/5 flex flex-row items-center justify-between">
+                      <div className="flex items-center gap-3 max-w-[50%]">
+                        {trend.logo ? (
+                          <img src={trend.logo} alt={trend.symbol} className="w-8 h-8 rounded-full bg-white p-0.5 shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 font-bold text-xs flex items-center justify-center shrink-0 text-slate-400">{trend.symbol.charAt(0)}</div>
+                        )}
+                        <a href={`https://statusinvest.com.br/acoes/${trend.symbol.replace('.SA', '').toLowerCase()}`} target="_blank" rel="noopener noreferrer" className="font-black text-lg text-white hover:text-orange-400 transition-colors truncate">
+                          {trend.symbol}
+                        </a>
+                      </div>
 
-                    <div className="text-right w-1/2">
-                      <div className="font-mono text-lg font-black text-white">{formatBRL(trend.price)}</div>
-                      <div className="flex items-center justify-end gap-2 text-xs font-bold mt-1">
-                        <span className="text-emerald-400">+{trend.changePercent.toFixed(2)}%</span>
-                        <span className="text-slate-500">•</span>
-                        <span className="text-slate-400">RSI <span className="text-orange-400">{trend.rsi.toFixed(0)}</span></span>
+                      <div className="text-right flex-1 ml-2">
+                        <div className="font-mono text-base sm:text-lg font-black text-white">{formatBRL(trend.price)}</div>
+                        <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2 text-[10px] sm:text-xs font-bold mt-1">
+                          <span className="text-emerald-400">+{trend.changePercent.toFixed(2)}%</span>
+                          <span className="text-slate-500">•</span>
+                          <span className="text-slate-400">RSI <span className="text-orange-400">{trend.rsi.toFixed(0)}</span></span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
 
-            <div className="mt-8 pt-8">
-              <h2 className="text-xl font-black text-white flex items-center gap-3 mb-6">
+            <div className="mt-8 pt-8 border-t border-white/5">
+              <h2 className="text-xl font-black text-white flex items-center gap-3 mb-5">
                 <Terminal className="w-5 h-5 text-indigo-400" />
                 Log do Sistema
               </h2>
-              <div className="bg-slate-950 p-5 rounded-3xl border border-slate-800 h-[280px] overflow-y-auto custom-scrollbar shadow-inner">
+              <div className="glass p-4 sm:p-5 rounded-2xl lg:rounded-[32px] border border-white/5 h-[280px] overflow-y-auto no-scrollbar shadow-inner">
                 <div className="space-y-3">
                   {(!data?.logs || data.logs.length === 0) && (
                     <p className="text-sm text-slate-500 font-medium">Os registros do motor aparecerão aqui.</p>

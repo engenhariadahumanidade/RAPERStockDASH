@@ -158,9 +158,9 @@ export default function AdminPage() {
         <div className="flex flex-col min-h-screen bg-slate-950">
             <Navbar />
 
-            <div className="max-w-6xl mx-auto w-full px-4 py-8">
-                <div className="flex items-center gap-4 mb-8">
-                    <div className="p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20">
+            <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 lg:py-10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
+                    <div className="p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20 shadow-inner">
                         <Users className="w-8 h-8 text-brand-400" />
                     </div>
                     <div>
@@ -169,12 +169,13 @@ export default function AdminPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8">
                     {/* Top Section: Registered Users List */}
-                    <div className="lg:col-span-2 glass p-8 sm:p-10 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col h-fit">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-white">Usuários Cadastrados</h2>
-                            <span className="px-3 py-1 bg-slate-800 text-slate-300 text-xs font-bold rounded-full">
+                    <div className="lg:col-span-2 glass p-5 sm:p-8 lg:p-10 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl flex flex-col h-fit relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 to-indigo-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2 tracking-tight">Usuários Cadastrados</h2>
+                            <span className="px-3 py-1.5 bg-slate-800/80 border border-slate-700 text-slate-300 text-xs font-bold rounded-full shadow-inner">
                                 {registeredUsers.length} usuários
                             </span>
                         </div>
@@ -244,13 +245,14 @@ export default function AdminPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
 
                     {/* Left Column: Form & Pre-Allowed List */}
-                    <div className="lg:col-span-1 space-y-8">
+                    <div className="lg:col-span-1 space-y-6 sm:space-y-8">
                         {/* Form Section */}
-                        <div className="glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl h-fit">
-                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <div className="glass p-5 sm:p-8 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl h-fit relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 to-transparent pointer-events-none"></div>
+                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10 tracking-tight">
                                 <UserPlus className="w-5 h-5 text-brand-400" />
                                 Convite Rápido
                             </h2>
@@ -285,8 +287,9 @@ export default function AdminPage() {
                         </div>
 
                         {/* Pre-allowed users (Not registered yet) */}
-                        <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl flex flex-col">
-                            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <div className="glass p-5 sm:p-6 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl flex flex-col relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/5 to-transparent pointer-events-none"></div>
+                            <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2 relative z-10 tracking-tight">
                                 <ShieldAlert className="w-5 h-5 text-yellow-500" />
                                 Pendentes de Cadastro
                             </h3>
@@ -318,9 +321,10 @@ export default function AdminPage() {
                     </div>
 
                     {/* Middle Column: Global Settings */}
-                    <div className="lg:col-span-1 space-y-8">
-                        <div className="glass p-8 rounded-[32px] border border-slate-700/50 shadow-2xl h-fit">
-                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <div className="lg:col-span-1 space-y-6 sm:space-y-8">
+                        <div className="glass p-5 sm:p-8 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl h-fit relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none"></div>
+                            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2 relative z-10 tracking-tight">
                                 <LinkIcon className="w-5 h-5 text-brand-400" />
                                 Webhook Central
                             </h2>
@@ -431,9 +435,10 @@ export default function AdminPage() {
                             </form>
                         </div>
 
-                        <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl">
-                            <h3 className="text-lg font-bold text-white mb-2">Disparo WhatsApp</h3>
-                            <p className="text-sm text-slate-400 mb-4">Envie uma notificação teste para o seu WhatsApp configurado via webhook.</p>
+                        <div className="glass p-5 sm:p-6 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none"></div>
+                            <h3 className="text-lg font-bold text-white mb-2 relative z-10 tracking-tight">Disparo WhatsApp</h3>
+                            <p className="text-sm text-slate-400 mb-4 relative z-10">Envie uma notificação teste para o seu WhatsApp configurado via webhook.</p>
                             <button
                                 onClick={handleTestWebhook}
                                 disabled={testStatus === 'loading'}
@@ -449,9 +454,10 @@ export default function AdminPage() {
                             </button>
                         </div>
 
-                        <div className="glass p-6 rounded-[32px] border border-slate-700/50 shadow-2xl mt-8">
-                            <h3 className="text-lg font-bold text-white mb-2">Testar OneSignal (Push)</h3>
-                            <p className="text-sm text-slate-400 mb-4">Envie uma notificação push teste para o seu próprio navegador ou celular.</p>
+                        <div className="glass p-5 sm:p-6 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl mt-6 sm:mt-8 relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 to-transparent pointer-events-none"></div>
+                            <h3 className="text-lg font-bold text-white mb-2 relative z-10 tracking-tight">Testar OneSignal (Push)</h3>
+                            <p className="text-sm text-slate-400 mb-4 relative z-10">Envie uma notificação push teste para o navegador ou celular.</p>
 
                             {/* Diagnostic Info */}
                             {oneSignalDiag && (

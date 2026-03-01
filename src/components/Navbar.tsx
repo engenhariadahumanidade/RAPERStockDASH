@@ -48,8 +48,8 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="flex flex-col lg:flex-row items-center justify-between p-4 mb-6 glass rounded-2xl shadow-xl shadow-black/50 border border-slate-700 gap-4 transition-all">
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+        <nav className="sticky top-0 z-50 flex flex-col lg:flex-row items-center justify-between p-4 lg:px-6 mb-6 glass lg:rounded-2xl rounded-b-2xl shadow-2xl shadow-black/20 border-b lg:border border-white/5 gap-4 transition-all">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-between lg:w-auto">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-gradient-to-tr from-brand-600 to-brand-500 rounded-xl shadow-lg shadow-brand-500/20">
                         <Activity className="w-5 h-5 text-white" />
@@ -65,24 +65,24 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-4 bg-slate-950/40 px-3 py-1.5 rounded-xl border border-slate-800/50">
-                    <div className="flex flex-col items-center sm:items-end">
-                        <span className="text-[9px] text-slate-500 font-black uppercase tracking-tighter flex items-center gap-1">
-                            <Clock className="w-2.5 h-2.5" /> Local
+                    <div className="flex flex-col items-center sm:items-end w-full sm:w-auto">
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-tighter flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> Local
                         </span>
-                        <span className="text-xs font-mono text-slate-200 font-bold">{now.toLocaleTimeString('pt-BR')}</span>
+                        <span className="text-sm font-mono text-slate-200 font-bold">{now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <div className="w-px h-6 bg-slate-800 hidden sm:block"></div>
-                    <div className="flex flex-col items-center sm:items-end">
-                        <span className="text-[9px] text-brand-500/80 font-black uppercase tracking-tighter flex items-center gap-1">
-                            <RefreshCw className="w-2.5 h-2.5" /> Scan
+                    <div className="w-px h-8 bg-slate-800 hidden sm:block"></div>
+                    <div className="flex flex-col items-center sm:items-start w-full sm:w-auto">
+                        <span className="text-[10px] text-brand-500/80 font-black uppercase tracking-tighter flex items-center gap-1">
+                            <RefreshCw className="w-3 h-3" /> Scan
                         </span>
-                        <span className="text-xs font-mono text-brand-400 font-bold">{nextScan ? nextScan.toLocaleTimeString('pt-BR') : '--:--:--'}</span>
+                        <span className="text-sm font-mono text-brand-400 font-bold">{nextScan ? nextScan.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}</span>
                     </div>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 justify-center">
-                <div className="flex gap-1.5">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto pt-2 lg:pt-0 border-t border-slate-800 lg:border-0">
+                <div className="flex w-full overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 justify-start sm:justify-center gap-2 custom-scrollbar no-scrollbar">
                     {navs.map((nav) => {
                         const isActive = pathname === nav.href;
                         const Icon = nav.icon;
@@ -103,11 +103,11 @@ export default function Navbar() {
                     })}
                 </div>
 
-                <div className="flex items-center gap-3 ml-2 pl-2 border-l border-slate-800">
+                <div className="flex items-center justify-between sm:justify-center w-full sm:w-auto gap-4 pl-0 sm:pl-4 border-t sm:border-t-0 sm:border-l border-slate-800 pt-3 sm:pt-0">
                     <SignedIn>
                         <UserButton afterSignOutUrl="/" appearance={{
                             elements: {
-                                avatarBox: "w-8 h-8 rounded-lg border border-slate-700 shadow-md"
+                                avatarBox: "w-9 h-9 rounded-xl border border-slate-700 shadow-md transition-transform hover:scale-105"
                             }
                         }} />
                     </SignedIn>
