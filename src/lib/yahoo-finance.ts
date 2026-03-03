@@ -52,7 +52,22 @@ export async function analyzeStock(symbol: string): Promise<StockAnalysis | null
         const cleanSymbol = symbol.replace('.SA', '').trim();
 
         // Use BRAPI with fundamental=true to get dividends
-        const response = await axios.get(`https://brapi.dev/api/quote/${cleanSymbol}?range=3mo&interval=1d&fundamental=true&dividends=true&token=6YU7waZ3NKfyjGYecT99mN`);
+        let response;
+        const token = '6YU7waZ3NKfyjGYecT99mN';
+        const baseUrl = `https://brapi.dev/api/quote/${cleanSymbol}?range=3mo&interval=1d&fundamental=true&token=${token}`;
+
+        try {
+            // Tenta obter com dividendos
+            response = await axios.get(`${baseUrl}&dividends=true`);
+        } catch (error: any) {
+            // Se falhar por causa do plano (403), tenta sem os dividendos para não quebrar a análise
+            if (error.response?.status === 403 || error.response?.status === 401) {
+                console.warn(`[BRAPI] Acesso a dividendos/fundamentais negado para ${cleanSymbol}. Tentando modo simplificado...`);
+                response = await axios.get(baseUrl);
+            } else {
+                throw error;
+            }
+        }
 
         if (!response.data || !response.data.results || response.data.results.length === 0) {
             return null;
