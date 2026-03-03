@@ -21,13 +21,18 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     const now = new Date();
     const minutes = now.getMinutes();
-    const isCloseToNextHour = minutes >= 55;
 
-    // Duplicity prevention: Avoid sending multiple alerts too close together
+    // Regra: Respeitar o horário definido pelo usuário IMEDIATAMENTE.
+    const currentStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+    const inWorkingHours = currentStr >= (settings.workStart || "10:00") && currentStr <= (settings.workEnd || "19:00");
+
+    if (!isTest && !inWorkingHours) {
+        return { status: "skipped", reason: "out_of_working_hours" };
+    }
+
     const lastAlertTime = settings.lastAlertTime ? new Date(settings.lastAlertTime) : null;
-    const secondsSinceLast = lastAlertTime ? (now.getTime() - lastAlertTime.getTime()) / 1000 : 9999;
-
     const isFirstTime = !lastAlertTime;
+
     const currentHourStart = new Date(now);
     currentHourStart.setMinutes(0, 0, 0);
 
@@ -40,33 +45,16 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
     const isIdleReportHour = ["11", "16"].includes(currentHourSP);
 
+    // Regra: Somente nas horas cheias (minutos no inicio da hora)
+    const isHoraCheia = minutes <= 15;
+
     // Bypass rules for manual tests
     if (!isTest) {
-        if (secondsSinceLast < 120) {
-            return { status: "skipped", reason: "duplicate_prevention_120s" }; // Duplicate prevention
-        }
-
-        // Priority Rule: If signals changed but we are close to the next hour, skip to wait for the full report.
-        if (!isNewHour && isChanged && isCloseToNextHour) {
-            await prisma.systemLog.create({
-                data: {
-                    userId,
-                    message: "⏳ Sinais detectados, porém postergados para o boletim da hora cheia (Faltam < 5min).",
-                    level: "info"
-                }
-            });
-            return { status: "skipped", reason: "postponed_to_next_hour" };
-        }
-
-        // Send logic:
-        // 1. Send if signals changed (ALWAYS)
-        // 2. Send if it's the very first time
-        // 3. Send if it's a new hour AND it's one of the status report windows (11h or 16h)
-        const shouldSend = isChanged || isFirstTime || (isNewHour && isIdleReportHour);
+        // Enviaremos 1 mensagem por hora (isNewHour) E SOMENTE nas horas cheias (isHoraCheia)
+        const shouldSend = isFirstTime || (isNewHour && isHoraCheia);
 
         if (!shouldSend) {
-            // Log subtle info that scan was done but skipped
-            return { status: "skipped", reason: "no_changes_and_not_report_hour" };
+            return { status: "skipped", reason: "not_time_for_hourly_report" };
         }
     }
 
@@ -122,59 +110,53 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     finalMsg += `\n\n⏰ Horário da Análise: ${now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`;
 
-    const currentStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
-    const inWorkingHours = currentStr >= (settings.workStart || "10:00") && currentStr <= (settings.workEnd || "19:00");
+    try {
+        // Envios
+        await sendWebhookMessage(settings.webhookUrl, settings.phoneNumber, finalMsg);
 
-    if (inWorkingHours || isTest) {
-        try {
-            // Envios
-            await sendWebhookMessage(settings.webhookUrl, settings.phoneNumber, finalMsg);
+        // Dispatch Push Notification
+        let pushTitle = "Alerta RAPERStock";
+        let pushMsg = "Tem movimentação na sua carteira!";
 
-            // Dispatch Push Notification
-            let pushTitle = "Alerta RAPERStock";
-            let pushMsg = "Tem movimentação na sua carteira!";
-
-            if (isTest) {
-                pushTitle = "Teste de Integração";
-                pushMsg = "Push Notification recebida com sucesso!";
-            } else if (alerts.length > 0) {
-                pushTitle = "🚀 Sinais Detectados";
-                pushMsg = `Identificamos ${alerts.length} ações com sinal de compra/venda. Acesse para ver!`;
-            } else if (isNewHour) {
-                pushTitle = "Boletim da Hora";
-                pushMsg = "Resumo atualizado do mercado para acompanhamento.";
-            }
-
-            // Manda especificamente para o UserID deste settings (External ID via Clerk)
-            if (userId) {
-                await sendPushNotification(pushTitle, pushMsg, [userId]);
-            }
-
-            // Don't update hash/time for tests to keep them independent
-            if (!isTest) {
-                await prisma.settings.update({
-                    where: { id: settings.id },
-                    data: { lastAlertHash: activeHash, lastAlertTime: now, lastAlertFullContent: finalMsg }
-                });
-
-                const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
-                const msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
-                await prisma.systemLog.create({ data: { userId, message: msgLog, level: "success" } });
-            } else {
-                await prisma.systemLog.create({
-                    data: {
-                        userId,
-                        message: "🧪 Disparo de teste manual enviado com sucesso.",
-                        level: "info"
-                    }
-                });
-            }
-            return { status: "sent", reason: isTest ? "test" : (isFirstTime ? "first_time" : isNewHour ? "new_hour_report" : "signals_changed") };
-        } catch (e) {
-            console.error("Falha ao enviar webhook", e);
-            await prisma.systemLog.create({ data: { userId, message: "❌ Falha no disparador de Webhook.", level: "warning" } });
-            return { status: "failed", reason: "webhook_error", error: String(e) };
+        if (isTest) {
+            pushTitle = "Teste de Integração";
+            pushMsg = "Push Notification recebida com sucesso!";
+        } else if (alerts.length > 0) {
+            pushTitle = "🚀 Sinais Detectados";
+            pushMsg = `Identificamos ${alerts.length} ações com sinal de compra/venda. Acesse para ver!`;
+        } else if (isNewHour) {
+            pushTitle = "Boletim da Hora";
+            pushMsg = "Resumo atualizado do mercado para acompanhamento.";
         }
+
+        // Manda especificamente para o UserID deste settings (External ID via Clerk)
+        if (userId) {
+            await sendPushNotification(pushTitle, pushMsg, [userId]);
+        }
+
+        // Don't update hash/time for tests to keep them independent
+        if (!isTest) {
+            await prisma.settings.update({
+                where: { id: settings.id },
+                data: { lastAlertHash: activeHash, lastAlertTime: now, lastAlertFullContent: finalMsg }
+            });
+
+            const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
+            const msgLog = isFirstTime ? "🚀 Primeiro boletim enviado!" : isNewHour ? `🕘 Boletim das ${currentHourSP}h enviado.` : "🚀 Sinais detectados! Novo alerta enviado.";
+            await prisma.systemLog.create({ data: { userId, message: msgLog, level: "success" } });
+        } else {
+            await prisma.systemLog.create({
+                data: {
+                    userId,
+                    message: "🧪 Disparo de teste manual enviado com sucesso.",
+                    level: "info"
+                }
+            });
+        }
+        return { status: "sent", reason: isTest ? "test" : (isFirstTime ? "first_time" : isNewHour ? "new_hour_report" : "signals_changed") };
+    } catch (e) {
+        console.error("Falha ao enviar webhook", e);
+        await prisma.systemLog.create({ data: { userId, message: "❌ Falha no disparador de Webhook.", level: "warning" } });
+        return { status: "failed", reason: "webhook_error", error: String(e) };
     }
-    return { status: "skipped", reason: "out_of_working_hours" };
 }

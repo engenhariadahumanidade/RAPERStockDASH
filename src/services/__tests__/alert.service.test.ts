@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { processAlerts } from '../alert.service';
 import prisma from '@/lib/prisma';
 import { sendWebhookMessage } from '@/lib/webhook';
@@ -36,7 +36,14 @@ describe('AlertService', () => {
         workEnd: '23:59',
     };
 
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     beforeEach(() => {
+        vi.useFakeTimers();
+        // 10:05 BRT (13:05 UTC) -> dentro de inWorkingHours (10-19) e isHoraCheia (<= 15 mins)
+        vi.setSystemTime(new Date('2026-03-01T13:05:00Z'));
         vi.clearAllMocks();
     });
 
@@ -60,30 +67,22 @@ describe('AlertService', () => {
             }));
         });
 
-        it('should NOT send alert if content hash has not changed', async () => {
-            // Content matches old hash (MD5 of "SignalNo suggestions")
-            // We'll just mock the hash calculation behavior by providing same strings
+        it('should NOT send alert if it is not hora cheia (e.g. minute 30)', async () => {
             const alerts = ['Signal'];
-            const suggestions = []; // This maps to "Nenhuma grande oportunidade no momento." in the code
+            const settings = { ...mockSettings, lastAlertTime: new Date('2026-03-01T11:00:00Z') };
 
-            // Re-calculate hash for the test to match expectation
-            // In alert.service.ts: const contentForHash = alertsText + suggestionsText;
-            const alertsText = 'Signal';
-            const suggestionsText = 'Nenhuma grande oportunidade no momento.';
-            const crypto = await import('crypto');
-            const hash = crypto.createHash('md5').update(alertsText + suggestionsText).digest('hex');
-
-            const settings = { ...mockSettings, lastAlertHash: hash };
+            vi.setSystemTime(new Date('2026-03-01T13:30:00Z')); // 10:30 BRT, NEW HOUR but NOT HORA CHEIA
 
             await processAlerts(alerts, [], settings, [], [], mockUser, 'User', false);
 
             expect(sendWebhookMessage).not.toHaveBeenCalled();
         });
 
-        it('should send alert if content changed', async () => {
-            const settings = { ...mockSettings, lastAlertHash: 'completely-different' };
+        it('should send alert if new hour and hora cheia', async () => {
+            const settings = { ...mockSettings, lastAlertTime: new Date('2026-03-01T11:00:00Z') }; // 08:00 BRT
             await processAlerts(['New Signal'], [], settings, [], [], mockUser, 'User', false);
 
+            // Time is 10:05 BRT, last alert was 08:00 BRT -> New Hour!
             expect(sendWebhookMessage).toHaveBeenCalled();
         });
 
