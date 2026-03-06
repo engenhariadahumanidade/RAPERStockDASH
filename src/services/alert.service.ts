@@ -4,7 +4,7 @@ import { sendPushNotification } from '@/lib/onesignal';
 import crypto from 'crypto';
 import { StockAnalysis } from '@/lib/yahoo-finance';
 
-export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor", isTest: boolean = false, forceSend: boolean = false) {
+export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor", isAdmin: boolean = false, isTest: boolean = false, forceSend: boolean = false) {
     if (!settings?.webhookUrl || !settings?.phoneNumber || (!settings.autoAlerts && !isTest)) {
         return { status: "skipped", reason: "no_contact_or_auto_alerts_disabled" };
     }
@@ -50,8 +50,15 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
 
     // Bypass rules for manual tests OR forced Cron jobs
     if (!isTest && !forceSend) {
-        // Envidaremos se for a primeira vez OU se virou a hora e estamos na janela da hora cheia
-        const shouldSend = isFirstTime || (isNewHour && isHoraCheia) || isChanged;
+        let shouldSend = false;
+
+        if (isAdmin) {
+            // ADMIN continua recebendo por mudança de sinal OU hora cheia
+            shouldSend = isFirstTime || isChanged || (isNewHour && isHoraCheia);
+        } else {
+            // USUÁRIOS COMUNS recebem APENAS na hora cheia (Boletim de Hora em Hora)
+            shouldSend = isFirstTime || (isNewHour && isHoraCheia);
+        }
 
         if (!shouldSend) {
             return { status: "skipped", reason: "not_time_for_hourly_report" };

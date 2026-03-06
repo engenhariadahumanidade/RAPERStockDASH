@@ -37,7 +37,7 @@ export async function runDashboardAnalysis(userId: string, triggerAlert: boolean
     let alertStatus = null;
     // 3. Send Alerts if requested
     if (triggerAlert && settings) {
-        alertStatus = await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName, isTest, forceSend);
+        alertStatus = await processAlerts(alerts, suggestions, settings, trending, analyzedPortfolio, userId, userName, !!user?.isAdmin, isTest, forceSend);
     }
 
     // Fetch last 5 logs for user
