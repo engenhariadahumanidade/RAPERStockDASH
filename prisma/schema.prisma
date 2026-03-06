@@ -39,7 +39,9 @@ model Settings {
   pushMessage    String   @default("Tem movimentação na sua carteira!")
   pushTestTitle  String   @default("Teste de Integração")
   pushTestMessage String  @default("Push Notification recebida com sucesso!")
+  masterSwitch  Boolean  @default(true)
   updatedAt     DateTime @updatedAt
+
 }
 
 
