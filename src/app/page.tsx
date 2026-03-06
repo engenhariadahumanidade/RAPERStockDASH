@@ -80,7 +80,7 @@ function SuggestionCard({ sug }: { sug: any }) {
 }
 
 export default function Dashboard() {
-  console.log("RAPERStock - Versão 4.3.5 - MULTI-TENANT");
+  console.log("RAPERStock - Versão 4.3.6 - MULTI-TENANT");
   const { user: clerkUser } = useUser();
   const isAdmin = clerkUser?.primaryEmailAddress?.emailAddress === "engenhariadahumanidade@gmail.com";
 
@@ -147,7 +147,7 @@ export default function Dashboard() {
         <section>
           <div className="flex items-center gap-3 mb-6">
             <Eye className="w-7 h-7 text-white" />
-            <h2 className="text-3xl font-black text-white tracking-tighter">Minha Carteira (v4.3.5)</h2>
+            <h2 className="text-3xl font-black text-white tracking-tighter">Minha Carteira (v4.3.6)</h2>
           </div>
 
           <div className="grid grid-cols-1 gap-5">
