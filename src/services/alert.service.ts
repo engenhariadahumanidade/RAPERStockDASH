@@ -120,7 +120,16 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
         let pushMsg = settings.pushMessage || "Tem movimentação na sua carteira!";
 
         const alertsCount = alerts.length.toString();
-        const replacePushVars = (str: string) => str.split('{{alerts_count}}').join(alertsCount);
+        const topTicker = alerts.length > 0 ? alerts[0].split(']')[0].replace('[', '') : (suggestions.length > 0 ? suggestions[0].symbol : '');
+        const currentTime = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        const replacePushVars = (str: string) => {
+            return str
+                .split('{{alerts_count}}').join(alertsCount)
+                .split('{{user_name}}').join(userName)
+                .split('{{top_ticker}}').join(topTicker)
+                .split('{{time}}').join(currentTime);
+        };
 
         pushTitle = replacePushVars(pushTitle);
         pushMsg = replacePushVars(pushMsg);

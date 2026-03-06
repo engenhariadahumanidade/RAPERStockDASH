@@ -47,8 +47,8 @@ export default function AdminPage() {
                 workEnd: settingsData.workEnd || '19:00',
                 masterSwitch: settingsData.masterSwitch ?? true,
                 customMessage: settingsData.customMessage || "🔔 *RELOJOARIA DO MERCADO - RAPERStock* 🔔\n\n📊 *PANORAMA DO DIA:*\n{{panorama}}\n\n🔥 *TICKERS EM ALTA TENSÃO:*\n{{trends}}\n\n💼 *NA SUA CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS CRÍTICOS:*\n{{alerts}}\n\n💡 *INTELIGÊNCIA DO SCANNER:*\n{{suggestions}}\n\n💰 *AÇÃO RECOMENDADA:* Avalie os pontos de entrada/saída no dashboard e aja com precisão! 🚀",
-                pushTitle: settingsData.pushTitle || "🚀 RAPERStock: Oportunidade!",
-                pushMessage: settingsData.pushMessage || "🔥 Identificamos {{alerts_count}} novos sinais críticos na sua carteira! O mercado está se movendo. Acesse e lucre! 📉📈💰",
+                pushTitle: settingsData.pushTitle || "🚀 {{top_ticker}}: Oportunidade!",
+                pushMessage: settingsData.pushMessage || "Olá {{user_name}}! 👋 🔥 Identificamos {{alerts_count}} novos sinais críticos, incluindo {{top_ticker}}. O mercado está se movendo às {{time}}. Acesse e lucre! 📉📈💰",
                 pushTestTitle: settingsData.pushTestTitle || "✅ Teste de Conexão RAPERStock",
                 pushTestMessage: settingsData.pushTestMessage || "Sua API do OneSignal está configurada com sucesso e pronta para disparar alertas reais! 🚀📊",
             });
@@ -501,7 +501,7 @@ export default function AdminPage() {
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Template Alerta (Usuário)</label>
                                         <button
                                             type="button"
-                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTitle: "🚀 RAPERStock: Oportunidade!", pushMessage: "🔥 Identificamos {{alerts_count}} novos sinais críticos na sua carteira! O mercado está se movendo. Acesse e lucre! 📉📈💰" })}
+                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTitle: "🚀 {{top_ticker}}: Oportunidade!", pushMessage: "Olá {{user_name}}! 👋 🔥 Identificamos {{alerts_count}} novos sinais críticos, incluindo {{top_ticker}}. O mercado está se movendo às {{time}}. Acesse e lucre! 📉📈💰" })}
                                             className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
                                         >
                                             Resetar
@@ -559,7 +559,7 @@ export default function AdminPage() {
                                     </div>
                                 </div>
                                 <p className="text-[10px] text-slate-500 italic">
-                                    Variável de Push: {'{{alerts_count}}'}.
+                                    Variáveis: {'{{alerts_count}}'}, {'{{user_name}}'}, {'{{top_ticker}}'}, {'{{time}}'}.
                                 </p>
                             </div>
                         </div>
