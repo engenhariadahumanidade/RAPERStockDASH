@@ -46,11 +46,11 @@ export default function AdminPage() {
                 workStart: settingsData.workStart || '10:00',
                 workEnd: settingsData.workEnd || '19:00',
                 masterSwitch: settingsData.masterSwitch ?? true,
-                customMessage: settingsData.customMessage || "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação.",
-                pushTitle: settingsData.pushTitle || "Alerta RAPERStock",
-                pushMessage: settingsData.pushMessage || "Tem movimentação na sua carteira!",
-                pushTestTitle: settingsData.pushTestTitle || "Teste de Integração",
-                pushTestMessage: settingsData.pushTestMessage || "Push Notification recebida com sucesso!",
+                customMessage: settingsData.customMessage || "🔔 *RELOJOARIA DO MERCADO - RAPERStock* 🔔\n\n📊 *PANORAMA DO DIA:*\n{{panorama}}\n\n🔥 *TICKERS EM ALTA TENSÃO:*\n{{trends}}\n\n💼 *NA SUA CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS CRÍTICOS:*\n{{alerts}}\n\n💡 *INTELIGÊNCIA DO SCANNER:*\n{{suggestions}}\n\n💰 *AÇÃO RECOMENDADA:* Avalie os pontos de entrada/saída no dashboard e aja com precisão! 🚀",
+                pushTitle: settingsData.pushTitle || "🚀 RAPERStock: Oportunidade!",
+                pushMessage: settingsData.pushMessage || "🔥 Identificamos {{alerts_count}} novos sinais críticos na sua carteira! O mercado está se movendo. Acesse e lucre! 📉📈💰",
+                pushTestTitle: settingsData.pushTestTitle || "✅ Teste de Conexão RAPERStock",
+                pushTestMessage: settingsData.pushTestMessage || "Sua API do OneSignal está configurada com sucesso e pronta para disparar alertas reais! 🚀📊",
             });
         }
         setLoading(false);
@@ -449,7 +449,7 @@ export default function AdminPage() {
                                         </label>
                                         <button
                                             type="button"
-                                            onClick={() => setGlobalSettings({ ...globalSettings, customMessage: "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação." })}
+                                            onClick={() => setGlobalSettings({ ...globalSettings, customMessage: "🔔 *RELOJOARIA DO MERCADO - RAPERStock* 🔔\n\n📊 *PANORAMA DO DIA:*\n{{panorama}}\n\n🔥 *TICKERS EM ALTA TENSÃO:*\n{{trends}}\n\n💼 *NA SUA CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS CRÍTICOS:*\n{{alerts}}\n\n💡 *INTELIGÊNCIA DO SCANNER:*\n{{suggestions}}\n\n💰 *AÇÃO RECOMENDADA:* Avalie os pontos de entrada/saída no dashboard e aja com precisão! 🚀" })}
                                             className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
                                         >
                                             Resetar
@@ -501,7 +501,7 @@ export default function AdminPage() {
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Template Alerta (Usuário)</label>
                                         <button
                                             type="button"
-                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTitle: "🚀 Alerta RAPERStock!", pushMessage: "🔥 Identificamos {{alerts_count}} novas movimentações importantes na sua carteira! Acesse agora para conferir as sugestões do scanner. 📈" })}
+                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTitle: "🚀 RAPERStock: Oportunidade!", pushMessage: "🔥 Identificamos {{alerts_count}} novos sinais críticos na sua carteira! O mercado está se movendo. Acesse e lucre! 📉📈💰" })}
                                             className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
                                         >
                                             Resetar
@@ -533,7 +533,7 @@ export default function AdminPage() {
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Template de Teste (Admin)</label>
                                         <button
                                             type="button"
-                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTestTitle: "✅ Teste de Integração", pushTestMessage: "Sua API do OneSignal está configurada corretamente e pronta para disparar alertas reais! 🚀💎" })}
+                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTestTitle: "✅ Teste de Conexão RAPERStock", pushTestMessage: "Sua API do OneSignal está configurada com sucesso e pronta para disparar alertas reais! 🚀📊 Prepare-se para lucrar! 🔥" })}
                                             className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
                                         >
                                             Resetar

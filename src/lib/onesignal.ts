@@ -1,4 +1,4 @@
-export async function sendPushNotification(title: string, message: string, userIds?: string[]): Promise<{ success: boolean; error?: string; data?: any }> {
+export async function sendPushNotification(title: string, message: string, userIds?: string[], imageUrl?: string): Promise<{ success: boolean; error?: string; data?: any }> {
     const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
     const restApiKey = process.env.ONESIGNAL_REST_API_KEY;
 
@@ -17,6 +17,8 @@ export async function sendPushNotification(title: string, message: string, userI
         headings: { en: title, pt: title },
         contents: { en: message, pt: message },
         url: process.env.NEXT_PUBLIC_APP_URL || "https://raper-stock-dash.vercel.app",
+        chrome_web_image: imageUrl || "https://images.unsplash.com/photo-1611974717482-999551c6e1db?q=80&w=600&auto=format&fit=crop",
+        big_picture: imageUrl || "https://images.unsplash.com/photo-1611974717482-999551c6e1db?q=80&w=600&auto=format&fit=crop",
     };
 
     if (userIds && userIds.length > 0) {
