@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
+import { useUser } from "@clerk/nextjs";
 import { Info, Loader2, Zap, Terminal, Flame, Eye } from "lucide-react";
 
 const formatBRL = (value: number) => {
@@ -79,7 +80,10 @@ function SuggestionCard({ sug }: { sug: any }) {
 }
 
 export default function Dashboard() {
-  console.log("RAPERStock - Versão 4.3.4 - MULTI-TENANT");
+  console.log("RAPERStock - Versão 4.3.5 - MULTI-TENANT");
+  const { user: clerkUser } = useUser();
+  const isAdmin = clerkUser?.primaryEmailAddress?.emailAddress === "engenhariadahumanidade@gmail.com";
+
   const [data, setData] = useState<{ portfolio: any[]; suggestions: any[]; trending?: any[]; scanInterval?: number; logs?: any[]; userName?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -143,7 +147,7 @@ export default function Dashboard() {
         <section>
           <div className="flex items-center gap-3 mb-6">
             <Eye className="w-7 h-7 text-white" />
-            <h2 className="text-3xl font-black text-white tracking-tighter">Minha Carteira (v4.3.4)</h2>
+            <h2 className="text-3xl font-black text-white tracking-tighter">Minha Carteira (v4.3.5)</h2>
           </div>
 
           <div className="grid grid-cols-1 gap-5">
@@ -300,33 +304,35 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-white/5">
-              <h2 className="text-xl font-black text-white flex items-center gap-3 mb-5">
-                <Terminal className="w-5 h-5 text-indigo-400" />
-                Log do Sistema
-              </h2>
-              <div className="glass p-4 sm:p-5 rounded-2xl lg:rounded-[32px] border border-white/5 h-[280px] overflow-y-auto no-scrollbar shadow-inner">
-                <div className="space-y-3">
-                  {(!data?.logs || data.logs.length === 0) && (
-                    <p className="text-sm text-slate-500 font-medium">Os registros do motor aparecerão aqui.</p>
-                  )}
-                  {data?.logs?.map((log, idx) => {
-                    const isSuccess = log.level === 'success';
-                    const isWarning = log.level === 'warning';
+            {isAdmin && (
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <h2 className="text-xl font-black text-white flex items-center gap-3 mb-5">
+                  <Terminal className="w-5 h-5 text-indigo-400" />
+                  Log do Sistema
+                </h2>
+                <div className="glass p-4 sm:p-5 rounded-2xl lg:rounded-[32px] border border-white/5 h-[280px] overflow-y-auto no-scrollbar shadow-inner">
+                  <div className="space-y-3">
+                    {(!data?.logs || data.logs.length === 0) && (
+                      <p className="text-sm text-slate-500 font-medium">Os registros do motor aparecerão aqui.</p>
+                    )}
+                    {data?.logs?.map((log, idx) => {
+                      const isSuccess = log.level === 'success';
+                      const isWarning = log.level === 'warning';
 
-                    return (
-                      <div key={idx} className="flex items-start gap-3 pb-3 border-b border-slate-800/60 last:border-0 last:pb-0">
-                        <div className={`w-2 h-2 shrink-0 rounded-full mt-1.5 ${isSuccess ? 'bg-emerald-500' : isWarning ? 'bg-orange-500' : 'bg-brand-500'} shadow-[0_0_8px_currentColor]`} />
-                        <div>
-                          <div className="text-[10px] text-slate-500 font-mono font-bold tracking-widest uppercase mb-0.5">{new Date(log.createdAt).toLocaleTimeString('pt-BR')}</div>
-                          <p className={`text-sm font-medium leading-snug ${isSuccess ? 'text-emerald-100' : isWarning ? 'text-orange-100' : 'text-slate-300'}`}>{log.message}</p>
+                      return (
+                        <div key={idx} className="flex items-start gap-3 pb-3 border-b border-slate-800/60 last:border-0 last:pb-0">
+                          <div className={`w-2 h-2 shrink-0 rounded-full mt-1.5 ${isSuccess ? 'bg-emerald-500' : isWarning ? 'bg-orange-500' : 'bg-brand-500'} shadow-[0_0_8px_currentColor]`} />
+                          <div>
+                            <div className="text-[10px] text-slate-500 font-mono font-bold tracking-widest uppercase mb-0.5">{new Date(log.createdAt).toLocaleTimeString('pt-BR')}</div>
+                            <p className={`text-sm font-medium leading-snug ${isSuccess ? 'text-emerald-100' : isWarning ? 'text-orange-100' : 'text-slate-300'}`}>{log.message}</p>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </section>
 
         </div>

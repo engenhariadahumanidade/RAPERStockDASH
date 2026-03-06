@@ -29,35 +29,44 @@ export default function BackgroundScanner() {
                     console.log(`[BackgroundScanner] ⏳ Scan pulado: ${data.reason} — ${data.message || ''}`);
                 }
 
-                // Adjust interval based on server response
-                if (data.nextCheck && data.nextCheck !== intervalRef.current) {
-                    setupInterval(data.nextCheck);
-                }
+                // Ajusta para a próxima hora cheia após o scan
+                scheduleNextHourlyScan();
             } catch (err) {
                 console.error('[BackgroundScanner] Erro na varredura:', err);
+                // Tenta novamente em 1 minuto se houver erro
+                intervalRef.current = setTimeout(triggerScan, 60000);
             } finally {
                 isRunningRef.current = false;
             }
         }
 
-        function setupInterval(ms: number) {
+        function scheduleNextHourlyScan() {
             if (intervalRef.current) {
-                clearInterval(intervalRef.current);
+                clearTimeout(intervalRef.current);
             }
-            intervalRef.current = setInterval(triggerScan, ms);
-            console.log(`[BackgroundScanner] ⏰ Próxima varredura em ${Math.round(ms / 60000)} minutos`);
+
+            const now = new Date();
+            const nextHour = new Date(now);
+            nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+
+            const msUntilNextHour = nextHour.getTime() - now.getTime();
+
+            // Usamos setTimeout para bater na hora cheia com precisão
+            intervalRef.current = setTimeout(triggerScan, msUntilNextHour);
+
+            console.log(`[BackgroundScanner] ⏰ Próxima varredura programada para às ${nextHour.getHours()}h:00m (${Math.round(msUntilNextHour / 60000)} min restantes)`);
         }
 
         // Initial scan after a short delay (let the page load first)
         const initialTimeout = setTimeout(() => {
             triggerScan();
-            setupInterval(DEFAULT_INTERVAL_MS);
         }, INITIAL_DELAY_MS);
 
-        // Handle visibility change - trigger scan when tab becomes visible again
+        // Handle visibility change - trigger scan if it's past target hour when tab becomes visible
         function handleVisibilityChange() {
             if (document.visibilityState === 'visible') {
-                console.log('[BackgroundScanner] 👀 Tab visível novamente, disparando varredura...');
+                console.log('[BackgroundScanner] 👀 Tab visível novamente.');
+                // Se estivermos em uma nova hora e não rodou ainda, dispara
                 triggerScan();
             }
         }
@@ -66,7 +75,7 @@ export default function BackgroundScanner() {
         return () => {
             clearTimeout(initialTimeout);
             if (intervalRef.current) {
-                clearInterval(intervalRef.current);
+                clearTimeout(intervalRef.current);
             }
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };

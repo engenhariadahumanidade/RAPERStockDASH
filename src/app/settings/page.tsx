@@ -92,7 +92,7 @@ export default function Settings() {
                             <p className="text-[10px] sm:text-xs text-slate-500 italic">Será enviado dentro do JSON para o webhook: {`{ phone, msg }`}</p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-4 border-t border-white/5">
+                        <div className="hidden">
                             <div className="space-y-2 sm:space-y-3">
                                 <label className="text-xs sm:text-sm font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                     Horário Início
@@ -116,7 +116,7 @@ export default function Settings() {
                                 />
                             </div>
                         </div>
-                        <p className="text-[10px] sm:text-xs text-slate-500 italic block mt-1">Neste período, o sistema envia o 1º boletim ao conectar, e de hora em hora caso não passe por nenhuma alteração.</p>
+                        <p className="text-[10px] sm:text-xs text-slate-500 italic block mt-1">Os boletins são enviados de hora em hora caso o sistema detecte novos sinais ou para panorama geral.</p>
 
                         <div className="flex items-start sm:items-center gap-3 sm:gap-4 py-3 sm:py-4 bg-slate-900/40 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-white/5 shadow-sm mt-4">
                             <input

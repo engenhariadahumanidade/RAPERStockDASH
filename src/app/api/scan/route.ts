@@ -39,25 +39,8 @@ export async function GET() {
         }
 
         // Check working hours (São Paulo timezone)
+        // REMOVIDO: Agora o scanner roda independente do horário, focado no login do ADMIN.
         const now = new Date();
-        const spTime = now.toLocaleTimeString('pt-BR', {
-            timeZone: 'America/Sao_Paulo',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        });
-
-        const workStart = adminSettings?.workStart || "10:00";
-        const workEnd = adminSettings?.workEnd || "19:00";
-
-        if (spTime < workStart || spTime > workEnd) {
-            return NextResponse.json({
-                triggered: false,
-                reason: 'fora_do_horario',
-                message: `Fora do horário de operação (${spTime}). O scanner está operando de ${workStart} às ${workEnd}.`,
-                nextCheck: MIN_SCAN_INTERVAL_MS
-            });
-        }
 
         // Prevent concurrent/duplicate scans
         const currentTime = Date.now();

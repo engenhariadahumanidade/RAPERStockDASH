@@ -4,7 +4,7 @@ import { sendPushNotification } from '@/lib/onesignal';
 import crypto from 'crypto';
 import { StockAnalysis } from '@/lib/yahoo-finance';
 
-export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor", isTest: boolean = false) {
+export async function processAlerts(alerts: string[], suggestions: StockAnalysis[], settings: any, trending: StockAnalysis[] = [], allPortfolio: any[] = [], userId: string, userName: string = "Investidor", isTest: boolean = false, forceSend: boolean = false) {
     if (!settings?.webhookUrl || !settings?.phoneNumber || (!settings.autoAlerts && !isTest)) {
         return { status: "skipped", reason: "no_contact_or_auto_alerts_disabled" };
     }
@@ -23,8 +23,8 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     const minutes = now.getMinutes();
 
     // Regra: Respeitar o horário definido pelo usuário IMEDIATAMENTE.
-    const currentStr = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
-    const inWorkingHours = currentStr >= (settings.workStart || "10:00") && currentStr <= (settings.workEnd || "19:00");
+    // REMOVIDO: Agora o horário é livre, controlado pelo Admin na interface.
+    const inWorkingHours = true;
 
     if (!isTest && !inWorkingHours) {
         return { status: "skipped", reason: "out_of_working_hours" };
@@ -45,18 +45,19 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
     const currentHourSP = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', hour12: false }).split(':')[0];
     const isIdleReportHour = ["11", "16"].includes(currentHourSP);
 
-    // Regra: Somente nas horas cheias (minutos no inicio da hora)
-    const isHoraCheia = minutes <= 15;
+    // Regra: Somente nas horas cheias (minutos no inicio da hora) ou se for o primeiro
+    const isHoraCheia = minutes <= 10; // Reduzido para 10 min de janela na hora cheia
 
-    // Bypass rules for manual tests
-    if (!isTest) {
-        // Enviaremos 1 mensagem por hora (isNewHour) E SOMENTE nas horas cheias (isHoraCheia)
-        const shouldSend = isFirstTime || (isNewHour && isHoraCheia);
+    // Bypass rules for manual tests OR forced Cron jobs
+    if (!isTest && !forceSend) {
+        // Envidaremos se for a primeira vez OU se virou a hora e estamos na janela da hora cheia
+        const shouldSend = isFirstTime || (isNewHour && isHoraCheia) || isChanged;
 
         if (!shouldSend) {
             return { status: "skipped", reason: "not_time_for_hourly_report" };
         }
     }
+
 
     // Prepare Extra Info
     const topTrends = trending.slice(0, 3).map(t => `🔥 [${t.symbol}] +${t.changePercent}% (RSI: ${t.rsi})`).join('\n') || 'Buscando tendências...';
@@ -114,25 +115,27 @@ export async function processAlerts(alerts: string[], suggestions: StockAnalysis
         // Envios
         await sendWebhookMessage(settings.webhookUrl, settings.phoneNumber, finalMsg);
 
-        // Dispatch Push Notification
-        let pushTitle = "Alerta RAPERStock";
-        let pushMsg = "Tem movimentação na sua carteira!";
+        // Prepare Push Notification Content from Templates
+        let pushTitle = settings.pushTitle || "Alerta RAPERStock";
+        let pushMsg = settings.pushMessage || "Tem movimentação na sua carteira!";
 
+        const alertsCount = alerts.length.toString();
+        const replacePushVars = (str: string) => str.split('{{alerts_count}}').join(alertsCount);
+
+        pushTitle = replacePushVars(pushTitle);
+        pushMsg = replacePushVars(pushMsg);
+
+        // Fallback for tests or specific states if not using variables
         if (isTest) {
-            pushTitle = "Teste de Integração";
-            pushMsg = "Push Notification recebida com sucesso!";
-        } else if (alerts.length > 0) {
-            pushTitle = "🚀 Sinais Detectados";
-            pushMsg = `Identificamos ${alerts.length} ações com sinal de compra/venda. Acesse para ver!`;
-        } else if (isNewHour) {
-            pushTitle = "Boletim da Hora";
-            pushMsg = "Resumo atualizado do mercado para acompanhamento.";
+            pushTitle = settings.pushTestTitle || "Teste de Integração";
+            pushMsg = settings.pushTestMessage || "Push Notification recebida com sucesso!";
         }
 
-        // Manda especificamente para o UserID deste settings (External ID via Clerk)
+        // Dispatch Push Notification
         if (userId) {
             await sendPushNotification(pushTitle, pushMsg, [userId]);
         }
+
 
         // Don't update hash/time for tests to keep them independent
         if (!isTest) {

@@ -35,9 +35,13 @@ model Settings {
   lastAlertFullContent String?
   workStart     String   @default("10:00")
   workEnd       String   @default("19:00")
-  masterSwitch  Boolean  @default(true)
+  pushTitle      String   @default("Alerta RAPERStock")
+  pushMessage    String   @default("Tem movimentação na sua carteira!")
+  pushTestTitle  String   @default("Teste de Integração")
+  pushTestMessage String  @default("Push Notification recebida com sucesso!")
   updatedAt     DateTime @updatedAt
 }
+
 
 model SystemLog {
   id        Int      @id @default(autoincrement())

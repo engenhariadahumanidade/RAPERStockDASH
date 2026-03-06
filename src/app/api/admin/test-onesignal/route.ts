@@ -36,11 +36,16 @@ export async function POST() {
         if (!user) return NextResponse.json({ success: false, error: `Usuário ${userId} não encontrado no banco` }, { status: 401 });
         if (!user.isAdmin) return NextResponse.json({ success: false, error: `Usuário ${userId} não é admin` }, { status: 403 });
 
+        const settings = await prisma.settings.findFirst();
+        const testTitle = settings?.pushTestTitle || "🚀 Notificação Push";
+        const testMessage = settings?.pushTestMessage || "A API do OneSignal está configurada e rodando 100% no seu servidor!";
+
         const result = await sendPushNotification(
-            "🚀 Notificação Push",
-            "A API do OneSignal está configurada e rodando 100% no seu servidor!",
+            testTitle,
+            testMessage,
             [userId]
         );
+
 
         return NextResponse.json({
             success: result.success,

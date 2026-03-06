@@ -16,8 +16,13 @@ export default function AdminPage() {
         customMessage: '',
         workStart: '10:00',
         workEnd: '19:00',
-        masterSwitch: true
+        masterSwitch: true,
+        pushTitle: '',
+        pushMessage: '',
+        pushTestTitle: '',
+        pushTestMessage: ''
     });
+
     const [savingSettings, setSavingSettings] = useState(false);
     const [testStatus, setTestStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [testOneSignalStatus, setTestOneSignalStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -42,6 +47,10 @@ export default function AdminPage() {
                 workEnd: settingsData.workEnd || '19:00',
                 masterSwitch: settingsData.masterSwitch ?? true,
                 customMessage: settingsData.customMessage || "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação.",
+                pushTitle: settingsData.pushTitle || "Alerta RAPERStock",
+                pushMessage: settingsData.pushMessage || "Tem movimentação na sua carteira!",
+                pushTestTitle: settingsData.pushTestTitle || "Teste de Integração",
+                pushTestMessage: settingsData.pushTestMessage || "Push Notification recebida com sucesso!",
             });
         }
         setLoading(false);
@@ -421,6 +430,58 @@ export default function AdminPage() {
                                     />
                                     <p className="text-[11px] text-slate-500 italic leading-relaxed">
                                         Use as variáveis {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'} e {'{{highlights}}'} onde desejar que o conteúdo flua automaticamente no webhook.
+                                    </p>
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-700/50 mt-4 space-y-4">
+                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                                        <ShieldCheck className="w-4 h-4 text-brand-400" />
+                                        Templates de Push (OneSignal)
+                                    </h3>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Título Alerta Usuário</label>
+                                            <input
+                                                type="text"
+                                                value={globalSettings.pushTitle}
+                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushTitle: e.target.value })}
+                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Mensagem Alerta Usuário</label>
+                                            <input
+                                                type="text"
+                                                value={globalSettings.pushMessage}
+                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushMessage: e.target.value })}
+                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Título Push Teste</label>
+                                            <input
+                                                type="text"
+                                                value={globalSettings.pushTestTitle}
+                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushTestTitle: e.target.value })}
+                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Mensagem Push Teste</label>
+                                            <input
+                                                type="text"
+                                                value={globalSettings.pushTestMessage}
+                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushTestMessage: e.target.value })}
+                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 italic">
+                                        Variáveis suportadas no Push: {'{{alerts_count}}'} (número de alertas ativos).
                                     </p>
                                 </div>
 

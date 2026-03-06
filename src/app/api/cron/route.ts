@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 
         for (const user of usersToAlert) {
             try {
-                const analysisResult = await runDashboardAnalysis(user.userId, true);
+                const analysisResult = await runDashboardAnalysis(user.userId, true, false, true);
 
                 const alertStatus = analysisResult.alertStatus;
 
