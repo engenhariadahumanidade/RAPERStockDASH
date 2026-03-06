@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Users, UserPlus, ShieldCheck, Mail, Loader2, PlayCircle, StopCircle, UserX, ShieldAlert, Link as LinkIcon, Save, Send, CheckCircle2 } from "lucide-react";
+import { Users, UserPlus, ShieldCheck, Mail, Loader2, PlayCircle, StopCircle, UserX, ShieldAlert, Link as LinkIcon, Save, Send, CheckCircle2, Activity } from "lucide-react";
 
 export default function AdminPage() {
     const [email, setEmail] = useState("");
@@ -329,20 +329,20 @@ export default function AdminPage() {
                         </div>
                     </div>
 
-                    {/* Middle Column: Global Settings */}
+                    {/* Configurações Globais (Loop e Horários) */}
                     <div className="lg:col-span-1 space-y-6 sm:space-y-8">
                         <div className="glass p-5 sm:p-8 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl h-fit relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none"></div>
                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2 relative z-10 tracking-tight">
                                 <LinkIcon className="w-5 h-5 text-brand-400" />
-                                Webhook Central
+                                Webhook Central & Timer
                             </h2>
-                            <p className="text-sm text-slate-400 mb-6">Configurações globais que valem para o disparo do sistema todo e o timer.</p>
+                            <p className="text-sm text-slate-400 mb-6">Controle o destino dos alertas e a frequência de escaneamento.</p>
 
                             <form onSubmit={handleSaveSettings} className="space-y-4">
                                 <div>
                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
-                                        URL do Webhook Master
+                                        URL do Webhook Master (WhatsApp)
                                     </label>
                                     <input
                                         type="url"
@@ -350,41 +350,42 @@ export default function AdminPage() {
                                         value={globalSettings.webhookUrl}
                                         onChange={(e) => setGlobalSettings({ ...globalSettings, webhookUrl: e.target.value })}
                                         className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
+                                        placeholder="https://sua-url-do-webhook.com"
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
-                                        Scan Loop (Minutos)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        required
-                                        min="1"
-                                        value={globalSettings.scanInterval}
-                                        onChange={(e) => setGlobalSettings({ ...globalSettings, scanInterval: parseInt(e.target.value) || 15 })}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
-                                    />
-                                </div>
-
-                                <div className="p-4 bg-slate-900 border border-slate-700/50 rounded-2xl flex items-center justify-between mt-4">
-                                    <div>
-                                        <label className="text-sm font-bold text-white block">Motor Principal (Master Switch)</label>
-                                        <p className="text-[11px] text-slate-400 mt-1">Habilita ou desabilita totalmente o scan e envios do sistema.</p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setGlobalSettings({ ...globalSettings, masterSwitch: !globalSettings.masterSwitch })}
-                                        className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${globalSettings.masterSwitch ? 'bg-emerald-500' : 'bg-slate-700'}`}
-                                    >
-                                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out ${globalSettings.masterSwitch ? 'translate-x-8 shadow-[0_0_10px_rgba(16,185,129,0.8)]' : 'translate-x-1'}`} />
-                                    </button>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4 mt-4">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
-                                            Hora de Início
+                                            Scan Loop (Minutos)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            required
+                                            min="1"
+                                            value={globalSettings.scanInterval}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, scanInterval: parseInt(e.target.value) || 15 })}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-sm"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col justify-end pb-1">
+                                        <div className="flex items-center justify-between bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase">Motor Principal</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setGlobalSettings({ ...globalSettings, masterSwitch: !globalSettings.masterSwitch })}
+                                                className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${globalSettings.masterSwitch ? 'bg-emerald-500' : 'bg-slate-700'}`}
+                                            >
+                                                <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition duration-200 ease-in-out ${globalSettings.masterSwitch ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
+                                            Janela Início
                                         </label>
                                         <input
                                             type="time"
@@ -396,7 +397,7 @@ export default function AdminPage() {
                                     </div>
                                     <div>
                                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 block">
-                                            Hora de Fim
+                                            Janela Fim
                                         </label>
                                         <input
                                             type="time"
@@ -408,176 +409,162 @@ export default function AdminPage() {
                                     </div>
                                 </div>
 
-                                <div className="pt-4 border-t border-slate-700/50 mt-4">
+                                <button
+                                    type="submit"
+                                    disabled={savingSettings}
+                                    className="w-full mt-4 py-4 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-2xl font-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-brand-500/20 active:scale-95"
+                                >
+                                    {savingSettings ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                    Salvar Configurações Globais
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    {/* Direita: Disparo WhatsApp e OneSignal com seus Templates */}
+                    <div className="lg:col-span-1 space-y-6 sm:space-y-8">
+                        {/* Seção WhatsApp */}
+                        <div className="glass p-5 sm:p-8 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none"></div>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-white flex items-center gap-2 relative z-10 tracking-tight">
+                                    <Send className="w-5 h-5 text-emerald-400" />
+                                    WhatsApp (Relatórios)
+                                </h3>
+                                <button
+                                    onClick={handleTestWebhook}
+                                    disabled={testStatus === 'loading'}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-black rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95"
+                                >
+                                    {testStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlayCircle className="w-4 h-4" />}
+                                    Disparar Teste
+                                </button>
+                            </div>
+
+                            <div className="space-y-4 relative z-10">
+                                <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl">
                                     <div className="flex justify-between items-center mb-3">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest block">
-                                            Mensagem de Alerta (Template)
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block">
+                                            Template da Mensagem (WhatsApp)
                                         </label>
                                         <button
                                             type="button"
                                             onClick={() => setGlobalSettings({ ...globalSettings, customMessage: "🕘 *BOLETIM DE MERCADO* 🕘\n\n📊 *PANORAMA GERAL:*\n{{panorama}}\n\n📈 *TENDÊNCIAS QUENTES:*\n{{trends}}\n\n💼 *DESTAQUES CARTEIRA:*\n{{highlights}}\n\n🚨 *SINAIS/ALERTAS:*\n{{alerts}}\n\n💡 *DICAS DO SCANNER:*\n{{suggestions}}\n\n⚠️ *ATENÇÃO:* Evite entradas pesadas sem confirmação." })}
-                                            className="text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg transition-all uppercase tracking-tight shadow-sm active:scale-95"
+                                            className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
                                         >
-                                            Restaurar Padrão
+                                            Resetar
                                         </button>
                                     </div>
                                     <textarea
-                                        rows={12}
-                                        required
+                                        rows={10}
                                         value={globalSettings.customMessage}
                                         onChange={(e) => setGlobalSettings({ ...globalSettings, customMessage: e.target.value })}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 px-5 text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 text-xs font-mono shadow-inner mb-2"
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-white text-xs font-mono focus:ring-1 focus:ring-emerald-500/50 outline-none"
                                     />
-                                    <p className="text-[11px] text-slate-500 italic leading-relaxed">
-                                        Use as variáveis {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'} e {'{{highlights}}'} onde desejar que o conteúdo flua automaticamente no webhook.
+                                    <p className="text-[10px] text-slate-500 mt-2 italic">
+                                        Variáveis: {'{{alerts}}'}, {'{{suggestions}}'}, {'{{panorama}}'}, {'{{trends}}'}, {'{{highlights}}'}.
                                     </p>
                                 </div>
-
-                                <div className="pt-4 border-t border-slate-700/50 mt-4 space-y-4">
-                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-brand-400" />
-                                        Templates de Push (OneSignal)
-                                    </h3>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Título Alerta Usuário</label>
-                                            <input
-                                                type="text"
-                                                value={globalSettings.pushTitle}
-                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushTitle: e.target.value })}
-                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Mensagem Alerta Usuário</label>
-                                            <input
-                                                type="text"
-                                                value={globalSettings.pushMessage}
-                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushMessage: e.target.value })}
-                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Título Push Teste</label>
-                                            <input
-                                                type="text"
-                                                value={globalSettings.pushTestTitle}
-                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushTestTitle: e.target.value })}
-                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Mensagem Push Teste</label>
-                                            <input
-                                                type="text"
-                                                value={globalSettings.pushTestMessage}
-                                                onChange={(e) => setGlobalSettings({ ...globalSettings, pushTestMessage: e.target.value })}
-                                                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500"
-                                            />
-                                        </div>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 italic">
-                                        Variáveis suportadas no Push: {'{{alerts_count}}'} (número de alertas ativos).
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={savingSettings}
-                                    className="w-full mt-2 py-3 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-                                >
-                                    {savingSettings ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                    Salvar Configs
-                                </button>
-                            </form>
+                            </div>
                         </div>
 
-                        <div className="glass p-5 sm:p-6 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none"></div>
-                            <h3 className="text-lg font-bold text-white mb-2 relative z-10 tracking-tight">Disparo WhatsApp</h3>
-                            <p className="text-sm text-slate-400 mb-4 relative z-10">Envie uma notificação teste para o seu WhatsApp configurado via webhook.</p>
-                            <button
-                                onClick={handleTestWebhook}
-                                disabled={testStatus === 'loading'}
-                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
-                            >
-                                {testStatus === 'loading' ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : testStatus === 'success' ? (
-                                    <><CheckCircle2 className="w-4 h-4" /> Sucesso!</>
-                                ) : (
-                                    <><Send className="w-4 h-4" /> Disparar Agora</>
-                                )}
-                            </button>
-                        </div>
-
-                        <div className="glass p-5 sm:p-6 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl mt-6 sm:mt-8 relative overflow-hidden">
+                        {/* Seção OneSignal (Push) */}
+                        <div className="glass p-5 sm:p-8 rounded-2xl lg:rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-b from-brand-500/5 to-transparent pointer-events-none"></div>
-                            <h3 className="text-lg font-bold text-white mb-2 relative z-10 tracking-tight">Testar OneSignal (Push)</h3>
-                            <p className="text-sm text-slate-400 mb-4 relative z-10">Envie uma notificação push teste para o navegador ou celular.</p>
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-white flex items-center gap-2 relative z-10 tracking-tight">
+                                    <Activity className="w-5 h-5 text-brand-400" />
+                                    Push Notifications (OneSignal)
+                                </h3>
+                                <button
+                                    onClick={handleTestOneSignal}
+                                    disabled={testOneSignalStatus === 'loading'}
+                                    className="px-4 py-2 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white text-xs font-black rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20 active:scale-95"
+                                >
+                                    {testOneSignalStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                    Disparar Push
+                                </button>
+                            </div>
 
-                            {/* Diagnostic Info */}
-                            {oneSignalDiag && (
-                                <div className={`mb-4 p-4 rounded-xl border text-xs space-y-1 ${oneSignalDiag.appIdConfigured && oneSignalDiag.restApiKeyConfigured
-                                    ? 'bg-emerald-500/10 border-emerald-500/30'
-                                    : 'bg-red-500/10 border-red-500/30'
-                                    }`}>
-                                    <p className="font-bold text-white text-sm mb-2">🔍 Diagnóstico (Env Vars na Vercel):</p>
-                                    <p className={oneSignalDiag.appIdConfigured ? 'text-emerald-400' : 'text-red-400'}>
-                                        {oneSignalDiag.appIdConfigured ? '✅' : '❌'} NEXT_PUBLIC_ONESIGNAL_APP_ID: {oneSignalDiag.appIdConfigured ? oneSignalDiag.appIdPreview : 'NÃO CONFIGURADA'}
-                                    </p>
-                                    <p className={oneSignalDiag.restApiKeyConfigured ? 'text-emerald-400' : 'text-red-400'}>
-                                        {oneSignalDiag.restApiKeyConfigured ? '✅' : '❌'} ONESIGNAL_REST_API_KEY: {oneSignalDiag.restApiKeyConfigured ? oneSignalDiag.restApiKeyPreview : 'NÃO CONFIGURADA'}
-                                    </p>
+                            {/* OneSignal Diagnostic Short */}
+                            {oneSignalDiag && !oneSignalDiag.appIdConfigured && (
+                                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] text-red-400 flex items-center gap-2">
+                                    <ShieldAlert className="w-4 h-4" />
+                                    <span>OneSignal não configurado corretamente nas variáveis de ambiente.</span>
                                 </div>
                             )}
 
-                            <button
-                                onClick={handleTestOneSignal}
-                                disabled={testOneSignalStatus === 'loading'}
-                                className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20"
-                            >
-                                {testOneSignalStatus === 'loading' ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : testOneSignalStatus === 'success' ? (
-                                    <><CheckCircle2 className="w-4 h-4" /> Notificação Enviada!</>
-                                ) : (
-                                    <><Send className="w-4 h-4" /> Disparar Push</>
-                                )}
-                            </button>
-
-                            {/* Test Result Details */}
-                            {oneSignalResult && (
-                                <div className={`mt-4 p-4 rounded-xl border text-xs font-mono ${oneSignalResult.success
-                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                                    : 'bg-red-500/10 border-red-500/30 text-red-300'
-                                    }`}>
-                                    <p className="font-bold text-sm mb-2 font-sans">
-                                        {oneSignalResult.success ? '✅ Sucesso!' : '❌ Falha no Envio'}
-                                    </p>
-                                    {oneSignalResult.notificationId && (
-                                        <p>📌 Notification ID: {oneSignalResult.notificationId}</p>
-                                    )}
-                                    {oneSignalResult.recipients !== null && oneSignalResult.recipients !== undefined && (
-                                        <p>👥 Recipients: {oneSignalResult.recipients}</p>
-                                    )}
-                                    {oneSignalResult.error && (
-                                        <p className="text-red-400">⚠️ Erro: {oneSignalResult.error}</p>
-                                    )}
-                                    {oneSignalResult.rawResponse && (
-                                        <details className="mt-2">
-                                            <summary className="cursor-pointer text-slate-400 hover:text-white transition-colors font-sans text-sm">Ver resposta completa</summary>
-                                            <pre className="mt-2 whitespace-pre-wrap text-[10px] text-slate-400 overflow-auto max-h-40">{JSON.stringify(oneSignalResult.rawResponse, null, 2)}</pre>
-                                        </details>
-                                    )}
+                            <div className="space-y-6 relative z-10">
+                                {/* Template Usuário */}
+                                <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Template Alerta (Usuário)</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTitle: "🚀 Alerta RAPERStock!", pushMessage: "🔥 Identificamos {{alerts_count}} novas movimentações importantes na sua carteira! Acesse agora para conferir as sugestões do scanner. 📈" })}
+                                            className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
+                                        >
+                                            Resetar
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <span className="text-[9px] text-slate-600 uppercase font-bold mb-1 block">Título</span>
+                                        <input
+                                            type="text"
+                                            value={globalSettings.pushTitle}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, pushTitle: e.target.value })}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500/50 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <span className="text-[9px] text-slate-600 uppercase font-bold mb-1 block">Mensagem</span>
+                                        <textarea
+                                            rows={3}
+                                            value={globalSettings.pushMessage}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, pushMessage: e.target.value })}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500/50 outline-none"
+                                        />
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* Template Teste */}
+                                <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-2xl space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Template de Teste (Admin)</label>
+                                        <button
+                                            type="button"
+                                            onClick={() => setGlobalSettings({ ...globalSettings, pushTestTitle: "✅ Teste de Integração", pushTestMessage: "Sua API do OneSignal está configurada corretamente e pronta para disparar alertas reais! 🚀💎" })}
+                                            className="text-[9px] font-black bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md transition-all uppercase"
+                                        >
+                                            Resetar
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <span className="text-[9px] text-slate-600 uppercase font-bold mb-1 block">Título</span>
+                                        <input
+                                            type="text"
+                                            value={globalSettings.pushTestTitle}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, pushTestTitle: e.target.value })}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500/50 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <span className="text-[9px] text-slate-600 uppercase font-bold mb-1 block">Mensagem</span>
+                                        <textarea
+                                            rows={2}
+                                            value={globalSettings.pushTestMessage}
+                                            onChange={(e) => setGlobalSettings({ ...globalSettings, pushTestMessage: e.target.value })}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 px-3 text-white text-xs focus:ring-1 focus:ring-brand-500/50 outline-none"
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-[10px] text-slate-500 italic">
+                                    Variável de Push: {'{{alerts_count}}'}.
+                                </p>
+                            </div>
                         </div>
                     </div>
+
 
 
                 </div>
